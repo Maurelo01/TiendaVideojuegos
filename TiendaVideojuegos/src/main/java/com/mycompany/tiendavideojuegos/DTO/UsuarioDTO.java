@@ -1,14 +1,20 @@
 package com.mycompany.tiendavideojuegos.DTO;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 public class UsuarioDTO 
 {
-    int idUsuario;
-    String correo;
-    String contraseña;
-    String rol;
-    Timestamp fechaRegistro;
+    private int idUsuario;
+    private String correo;
+    private String contraseña;
+    private String rol;
+    private String nickname;
+    private Date fechaNacimiento;
+    private String telefono;
+    private String pais;
+    private float saldoCartera;
+    
     
     public int getIdUsuario() 
     {
@@ -28,6 +34,16 @@ public class UsuarioDTO
     public void setCorreo(String correo) 
     {
         this.correo = correo;
+    }
+    
+    public String getNickname() 
+    {
+        return nickname; 
+    }
+    
+    public void setNickname(String nickname) 
+    {
+        this.nickname = nickname; 
     }
 
     public String getContraseña() 
@@ -50,13 +66,43 @@ public class UsuarioDTO
         this.rol = rol;
     }
 
-    public Timestamp getFechaRegistro() 
+    public Date getFechaNacimiento() 
     {
-        return fechaRegistro;
+        return fechaNacimiento; 
+    }
+    
+    public void setFechaNacimiento(Date fechaNacimiento) 
+    {
+        this.fechaNacimiento = fechaNacimiento; 
+    }
+    
+    public String getTelefono() 
+    {
+        return telefono; 
+    }
+    
+    public void setTelefono(String telefono) 
+    {
+        this.telefono = telefono; 
     }
 
-    public void setFechaRegistro(Timestamp fechaRegistro) 
+    public String getPais() 
     {
-        this.fechaRegistro = fechaRegistro;
+        return pais; 
+    }
+    
+    public void setPais(String pais) 
+    {
+        this.pais = pais;
+    }
+
+    public float getSaldoCartera() 
+    {
+        return saldoCartera; 
+    }
+    
+    public void setSaldoCartera(float saldoCartera) 
+    {
+        this.saldoCartera = saldoCartera; 
     }
 }
