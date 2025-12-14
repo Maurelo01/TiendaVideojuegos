@@ -2,6 +2,7 @@ package com.mycompany.tiendavideojuegos.models;
 
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
+import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,6 +13,10 @@ public class Usuario
     protected String correo;
     protected String contraseña;
     protected String rol;
+    
+    public Usuario()
+    {
+    }
     
     public Usuario(String correo, String contraseña, String rol) 
     {
@@ -38,6 +43,10 @@ public class Usuario
                     if ("GAMER".equals(rol))
                     {
                         usuarioDTO = obtenerGamerCompleto(conn, idUsuario, rs);
+                    }
+                    else if ("EMPRESA".equals(rol))
+                    {
+                        usuarioDTO = obtenerEmpresaCompleto(conn, idUsuario, rs);
                     }
                     else
                     {
@@ -67,14 +76,14 @@ public class Usuario
         dto.setFechaRegistro(rs.getTimestamp("fecha_registro"));
     }
     
-    private UsuarioComunGamerDTO obtenerGamerCompleto(Connection conn, int idUser, ResultSet rsPadre) throws Exception 
+    private UsuarioComunGamerDTO obtenerGamerCompleto(Connection conn, int idUsuario, ResultSet rsPadre) throws Exception 
     {
         UsuarioComunGamerDTO gamer = new UsuarioComunGamerDTO();
         llenarDatos(gamer, rsPadre);
         var ps = conn.prepareStatement("SELECT * FROM Usuario_Comun_Gamer WHERE id_usuario = ?");
         try (ps) 
         {
-            ps.setInt(1, idUser);
+            ps.setInt(1, idUsuario);
             var rs = ps.executeQuery();
             if (rs.next()) 
             {
@@ -86,5 +95,27 @@ public class Usuario
             }
         }
         return gamer;
+    }
+    
+    private UsuarioEmpresaDTO obtenerEmpresaCompleto(java.sql.Connection conn, int idUsuario, ResultSet rsPadre) throws Exception 
+    {
+        var empresa = new UsuarioEmpresaDTO();
+        llenarDatos(empresa, rsPadre);
+        var ps = conn.prepareStatement("SELECT ue.*, e.nombre_empresa FROM Usuario_Empresa ue JOIN Empresa e ON ue.id_empresa = e.id_empresa WHERE ue.id_usuario = ?");
+        try (ps)
+        {
+            ps.setInt(1, idUsuario);
+            var rs = ps.executeQuery();
+            if (rs.next())
+            {
+                empresa.setIdEmpresa(rs.getInt("id_empresa"));
+                empresa.setNombreEmpleado(rs.getString("nombre_empleado"));
+                empresa.setFechaNacimiento(rs.getDate("fecha_nacimiento_empleado"));
+                empresa.setNombreEmpresaAux(rs.getString("nombre_empresa"));
+            }
+            rs.close();
+            ps.close();
+        }
+        return empresa;
     }
 }
