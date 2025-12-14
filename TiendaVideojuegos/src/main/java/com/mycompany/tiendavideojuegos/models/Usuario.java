@@ -1,33 +1,57 @@
 package com.mycompany.tiendavideojuegos.models;
 
-import java.sql.Timestamp;
+import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
+import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 
 public class Usuario 
 {
-    int idUsuario;
-    String correo;
-    String contraseña;
-    String rol;
-    Timestamp fechaRegistro;
+    protected int idUsuario;
+    protected String correo;
+    protected String contraseña;
+    protected String rol;
     
-    public Usuario()
+    public Usuario() 
     {
-        // Vacio por si acaso
     }
-    
-    public Usuario(String correo, String contraseña, String rol) // Para nuevos usuarios
+
+    public Usuario(String correo, String contraseña, String rol) 
     {
         this.correo = correo;
         this.contraseña = contraseña;
         this.rol = rol;
     }
     
-    public Usuario(int idUsuario, String correo, String contraseña, String rol, Timestamp fechaRegistro) // Para leer de la base de datos
+    public UsuarioDTO login(String correo, String contraseña)
     {
-        this.idUsuario = idUsuario;
-        this.correo = correo;
-        this.contraseña = contraseña;
-        this.rol = rol;
-        this.fechaRegistro = fechaRegistro;
+        ConexionDB connMySQL = new ConexionDB();
+        var conn = connMySQL.conectar();
+        UsuarioDTO usuarioDTO = null;
+        
+        try
+        {
+            var ps = conn.prepareStatement("SELECT * FROM Usuario WHERE correo = ? AND contraseña = ?");
+            ps.setString(1, correo);
+            ps.setString(2, contraseña);
+            var rs = ps.executeQuery();
+            try (rs)
+            {
+                if (rs.next())
+                {
+                    usuarioDTO = new UsuarioDTO();
+                    usuarioDTO.setIdUsuario(rs.getInt("id_usuario"));
+                    usuarioDTO.setCorreo(rs.getString("correo"));
+                    usuarioDTO.setRol(rs.getString("rol"));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error en login: " + e.getMessage());
+        }
+        finally 
+        {
+            connMySQL.desconectar(conn);
+        }
+        return usuarioDTO;
     }
 }
