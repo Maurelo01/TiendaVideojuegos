@@ -1,6 +1,5 @@
 package com.mycompany.tiendavideojuegos.DTO;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public class UsuarioDTO 
@@ -9,12 +8,7 @@ public class UsuarioDTO
     private String correo;
     private String contraseña;
     private String rol;
-    private String nickname;
-    private Date fechaNacimiento;
-    private String telefono;
-    private String pais;
-    private float saldoCartera;
-    
+    private Timestamp fechaRegistro;
     
     public int getIdUsuario() 
     {
@@ -35,23 +29,13 @@ public class UsuarioDTO
     {
         this.correo = correo;
     }
-    
-    public String getNickname() 
-    {
-        return nickname; 
-    }
-    
-    public void setNickname(String nickname) 
-    {
-        this.nickname = nickname; 
-    }
 
     public String getContraseña() 
     {
         return contraseña;
     }
 
-    public void setcontraseña(String contraseña) 
+    public void setContraseña(String contraseña) 
     {
         this.contraseña = contraseña;
     }
@@ -65,44 +49,14 @@ public class UsuarioDTO
     {
         this.rol = rol;
     }
-
-    public Date getFechaNacimiento() 
-    {
-        return fechaNacimiento; 
+    
+    public Timestamp getFechaRegistro() 
+    { 
+        return fechaRegistro; 
     }
     
-    public void setFechaNacimiento(Date fechaNacimiento) 
-    {
-        this.fechaNacimiento = fechaNacimiento; 
-    }
-    
-    public String getTelefono() 
-    {
-        return telefono; 
-    }
-    
-    public void setTelefono(String telefono) 
-    {
-        this.telefono = telefono; 
-    }
-
-    public String getPais() 
-    {
-        return pais; 
-    }
-    
-    public void setPais(String pais) 
-    {
-        this.pais = pais;
-    }
-
-    public float getSaldoCartera() 
-    {
-        return saldoCartera; 
-    }
-    
-    public void setSaldoCartera(float saldoCartera) 
-    {
-        this.saldoCartera = saldoCartera; 
+    public void setFechaRegistro(Timestamp fechaRegistro) 
+    { 
+        this.fechaRegistro = fechaRegistro; 
     }
 }
