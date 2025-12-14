@@ -1,3 +1,11 @@
+com/mycompany/tiendavideojuegos/models/UsuarioComunGamer.class
+com/mycompany/tiendavideojuegos/models/Usuario.class
 com/mycompany/tiendavideojuegos/JakartaRestConfiguration.class
 com/mycompany/tiendavideojuegos/configuracion/ConexionDB.class
+com/mycompany/tiendavideojuegos/Prueba.class
+com/mycompany/tiendavideojuegos/DTO/UsuarioEmpresaDTO.class
+com/mycompany/tiendavideojuegos/DTO/EmpresaDTO.class
+com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.class
+com/mycompany/tiendavideojuegos/DTO/UsuarioDTO.class
+com/mycompany/tiendavideojuegos/models/UsuarioEmpresa.class
 com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.class
