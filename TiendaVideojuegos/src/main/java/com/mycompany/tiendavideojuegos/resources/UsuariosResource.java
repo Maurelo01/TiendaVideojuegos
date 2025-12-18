@@ -8,12 +8,14 @@ import com.mycompany.tiendavideojuegos.models.Usuario;
 import com.mycompany.tiendavideojuegos.models.UsuarioComunGamer;
 import com.mycompany.tiendavideojuegos.models.UsuarioEmpresa;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+@Path("usuarios")
 public class UsuariosResource 
 {
     private final Usuario modeloUsuario = new Usuario();
