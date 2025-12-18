@@ -35,4 +35,17 @@ public class VideojuegosResource
     {
         return Response.ok(modelo.listarPorEmpresa(idEmpresa)).build();
     }
+    
+    @POST
+    @Path("{id}") // /api/videojuegos/{id}
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editarJuego(@PathParam("id") int id, VideojuegosDTO juego) {
+        juego.setIdJuego(id);
+        if (modelo.editar(juego)) 
+        {
+            return Response.ok("Exito: Juego actualizado exitosamente").build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).entity("error: No se pudo actualizar el juego. Verifique el id.").build();
+    }
 }

@@ -140,4 +140,78 @@ public class Videojuegos
         }
         return lista;
     }
+    
+    public boolean editar(VideojuegosDTO juego)
+    {
+        ConexionDB connMySQL = new ConexionDB();
+        var conn = connMySQL.conectar();
+        boolean exito = false;
+        try
+        {
+            var ps = conn.prepareStatement("UPDATE Videojuego SET titulo=?, descripcion=?, precio=?, recursos_minimos=?, clasificacion_edad=?, comentarios_estado=? WHERE id_juego=?");
+            ps.setString(1, juego.getTitulo());
+            ps.setString(2, juego.getDescripcion());
+            ps.setFloat(3, juego.getPrecio());
+            ps.setString(4, juego.getRecursosMinimos());
+            ps.setString(5, juego.getClasificacionEdad());
+            ps.setBoolean(6, juego.isComentariosEstado());
+            ps.setInt(7, juego.getIdJuego());
+            int filas = ps.executeUpdate();
+            ps.close();
+            if(filas > 0)
+            {
+                if (juego.getIdsCategorias() != null) 
+                {
+                    // Actualizar categorias
+                    var psDelCat = conn.prepareStatement("DELETE FROM Juego_Categoria WHERE id_juego = ?");
+                    psDelCat.setInt(1, juego.getIdJuego());
+                    psDelCat.executeUpdate();
+                    psDelCat.close();
+                    // Insertar nuevas categorias 
+                    if (!juego.getIdsCategorias().isEmpty()) 
+                    {
+                        var psInsCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)");
+                        for (Integer idCat : juego.getIdsCategorias()) 
+                        {
+                            psInsCat.setInt(1, juego.getIdJuego());
+                            psInsCat.setInt(2, idCat);
+                            psInsCat.executeUpdate();
+                        }
+                        psInsCat.close();
+                    }
+                }
+                if (juego.getMultimedia() != null) 
+                {
+                    // Borrar multimedia antigua
+                    var psDelMedia = conn.prepareStatement("DELETE FROM Multimedia WHERE id_juego = ?");
+                    psDelMedia.setInt(1, juego.getIdJuego());
+                    psDelMedia.executeUpdate();
+                    psDelMedia.close();
+                    // Insertar nueva
+                    if (!juego.getMultimedia().isEmpty()) 
+                    {
+                        var psInsMed = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)");
+                        for (MultimediaDTO media : juego.getMultimedia()) 
+                        {
+                            psInsMed.setInt(1, juego.getIdJuego());
+                            psInsMed.setString(2, media.getUrl());
+                            psInsMed.setString(3, media.getTipo());
+                            psInsMed.executeUpdate();
+                        }
+                        psInsMed.close();
+                    }
+                }
+                exito = true;
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error al editar videojuego: " + e.getMessage());
+        }
+        finally 
+        {
+            connMySQL.desconectar(conn);
+        }
+        return exito;
+    }
 }
