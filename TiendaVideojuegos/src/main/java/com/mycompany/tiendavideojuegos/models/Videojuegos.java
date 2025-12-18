@@ -3,6 +3,7 @@ package com.mycompany.tiendavideojuegos.models;
 import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class Videojuegos
         try 
         {
             // Insertar Juego
-            var ps = conn.prepareStatement("INSERT INTO Videojuego (id_empresa, titulo, descripcion, precio, recursos_minimos, clasificacion_edad, estado, fecha_publicacion, comentarios_estado) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)");
+            var ps = conn.prepareStatement("INSERT INTO Videojuego (id_empresa, titulo, descripcion, precio, recursos_minimos, clasificacion_edad, estado, fecha_publicacion, comentarios_estado) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, juego.getIdEmpresa());
             ps.setString(2, juego.getTitulo());
             ps.setString(3, juego.getDescripcion());
@@ -26,14 +27,19 @@ public class Videojuegos
             ps.setString(6, juego.getClasificacionEdad());
             ps.setString(7, "ACTIVO");
             ps.setBoolean(8, true);
-            var rsKeys = ps.getGeneratedKeys();
-            if(rsKeys.next()) // Recupera la id
+            int filas = ps.executeUpdate();
+            if (filas == 0) 
             {
-                idJuegoGenerado = rsKeys.getInt(1);
+                throw new Exception("No se insertó el videojuego");
             }
-            rsKeys.close();
+            var rsKeys = ps.getGeneratedKeys();
+            if (!rsKeys.next()) 
+            {
+                throw new Exception("No se generó id del videojuego");
+            }
+            idJuegoGenerado = rsKeys.getInt(1);
             ps.close();
-            if (ps.executeUpdate() > 0 && idJuegoGenerado != -1) 
+            if (filas > 0 && idJuegoGenerado != -1) 
             {
                 // Insertar multimedia
                 if (juego.getMultimedia() != null && !juego.getMultimedia().isEmpty()) 
@@ -44,7 +50,10 @@ public class Videojuegos
                         psMedia.setInt(1, idJuegoGenerado);
                         psMedia.setString(2, media.getUrl());
                         psMedia.setString(3, media.getTipo());
-                        psMedia.executeUpdate();
+                        if (psMedia.executeUpdate() == 0) 
+                        {
+                            throw new Exception("Error insertando multimedia");
+                        }
                     }
                     psMedia.close();
                 }
@@ -56,7 +65,10 @@ public class Videojuegos
                     {
                         psCat.setInt(1, idJuegoGenerado);
                         psCat.setInt(2, idCat);
-                        psCat.executeUpdate();
+                        if (psCat.executeUpdate() == 0) 
+                        {
+                            throw new Exception("Error insertando categoría");
+                        }
                     }
                     psCat.close();
                 }
@@ -74,7 +86,8 @@ public class Videojuegos
                     var psDel = conn.prepareStatement("DELETE FROM Videojuego WHERE id_juego = ?");
                     psDel.setInt(1, idJuegoGenerado);
                     psDel.executeUpdate();
-                    System.out.println("Error: Se eliminó el registro del videojuego por error en añadir sus recursos.");
+                    psDel.close();
+                    System.out.println("Se eliminó el registro del videojuego por error en añadir sus recursos.");
                 } 
                 catch (Exception ex) 
                 {

@@ -4,6 +4,7 @@
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/UsuarioEmpresaDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/configuracion/ConexionDB.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/models/Usuario.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/VideojuegosResource.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/CategoriaDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.java
