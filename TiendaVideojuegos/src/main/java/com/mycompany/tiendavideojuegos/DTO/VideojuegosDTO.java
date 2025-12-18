@@ -1,6 +1,8 @@
 package com.mycompany.tiendavideojuegos.DTO;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VideojuegosDTO 
 {
@@ -15,6 +17,8 @@ public class VideojuegosDTO
     private Date fechaPublicacion;
     private boolean comentariosEstado;
     private String nombreEmpresa;
+    private List<MultimediaDTO> multimedia = new ArrayList<>();
+    private List<Integer> idsCategorias = new ArrayList<>();
     
     public int getIdJuego() 
     {
@@ -123,5 +127,25 @@ public class VideojuegosDTO
     public void setNombreEmpresa(String nombreEmpresa)
     {
         this.nombreEmpresa = nombreEmpresa;
+    }
+    
+    public List<MultimediaDTO> getMultimedia() 
+    {
+        return multimedia;
+    }
+    
+    public void setMultimedia(List<MultimediaDTO> multimedia) 
+    {
+        this.multimedia = multimedia;
+    }
+    
+    public List<Integer> getIdsCategorias() 
+    {
+        return idsCategorias;
+    }
+    
+    public void setIdsCategorias(List<Integer> idsCategorias) 
+    {
+        this.idsCategorias = idsCategorias;
     }
 }

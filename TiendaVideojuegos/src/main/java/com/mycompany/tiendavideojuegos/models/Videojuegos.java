@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.models;
 
+import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.util.ArrayList;
@@ -12,8 +13,10 @@ public class Videojuegos
         ConexionDB connMySQL = new ConexionDB();
         var conn = connMySQL.conectar();
         boolean exito = false;
+        int idJuegoGenerado = -1; // guardar id 
         try 
         {
+            // Insertar Juego
             var ps = conn.prepareStatement("INSERT INTO Videojuego (id_empresa, titulo, descripcion, precio, recursos_minimos, clasificacion_edad, estado, fecha_publicacion, comentarios_estado) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)");
             ps.setInt(1, juego.getIdEmpresa());
             ps.setString(2, juego.getTitulo());
@@ -23,8 +26,40 @@ public class Videojuegos
             ps.setString(6, juego.getClasificacionEdad());
             ps.setString(7, "ACTIVO");
             ps.setBoolean(8, true);
-            if (ps.executeUpdate() > 0) 
+            var rsKeys = ps.getGeneratedKeys();
+            if(rsKeys.next()) // Recupera la id
             {
+                idJuegoGenerado = rsKeys.getInt(1);
+            }
+            rsKeys.close();
+            ps.close();
+            if (ps.executeUpdate() > 0 && idJuegoGenerado != -1) 
+            {
+                // Insertar multimedia
+                if (juego.getMultimedia() != null && !juego.getMultimedia().isEmpty()) 
+                {
+                    var psMedia = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)");
+                    for (MultimediaDTO media : juego.getMultimedia()) 
+                    {
+                        psMedia.setInt(1, idJuegoGenerado);
+                        psMedia.setString(2, media.getUrl());
+                        psMedia.setString(3, media.getTipo());
+                        psMedia.executeUpdate();
+                    }
+                    psMedia.close();
+                }
+                // Insertar categorias
+                if (juego.getIdsCategorias() != null && !juego.getIdsCategorias().isEmpty()) 
+                {
+                    var psCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)");
+                    for (Integer idCat : juego.getIdsCategorias())
+                    {
+                        psCat.setInt(1, idJuegoGenerado);
+                        psCat.setInt(2, idCat);
+                        psCat.executeUpdate();
+                    }
+                    psCat.close();
+                }
                 exito = true;
             }
             ps.close();
@@ -32,6 +67,20 @@ public class Videojuegos
         catch (Exception e) 
         {
             System.err.println("Error publicando videojuego: " + e.getMessage());
+            if (idJuegoGenerado != -1) 
+            {
+                try 
+                {
+                    var psDel = conn.prepareStatement("DELETE FROM Videojuego WHERE id_juego = ?");
+                    psDel.setInt(1, idJuegoGenerado);
+                    psDel.executeUpdate();
+                    System.out.println("Error: Se eliminó el registro del videojuego por error en añadir sus recursos.");
+                } 
+                catch (Exception ex) 
+                {
+                    System.err.println("Error al intentar borrar registro incompleto: " + ex.getMessage());
+                }
+            }
         }
         finally 
         {
