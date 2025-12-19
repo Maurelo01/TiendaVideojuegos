@@ -4,11 +4,8 @@ import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
-import com.mycompany.tiendavideojuegos.models.Usuario;
-import com.mycompany.tiendavideojuegos.models.UsuarioComunGamer;
-import com.mycompany.tiendavideojuegos.models.UsuarioEmpresa;
+import com.mycompany.tiendavideojuegos.services.UsuariosService;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -18,9 +15,7 @@ import jakarta.ws.rs.core.Response;
 @Path("usuarios")
 public class UsuariosResource 
 {
-    private final Usuario modeloUsuario = new Usuario();
-    private final UsuarioComunGamer modeloGamer = new UsuarioComunGamer();
-    private final UsuarioEmpresa modeloEmpresa = new UsuarioEmpresa();
+    private final UsuariosService service = new UsuariosService();
     
     @POST // /api/usuarios/login
     @Path("login")
@@ -30,7 +25,7 @@ public class UsuariosResource
     {
         try 
         {
-            var usuario = modeloUsuario.login(credenciales.getCorreo(), credenciales.getContraseña());
+            UsuarioDTO usuario = service.login(credenciales.getCorreo(), credenciales.getContraseña());
             if (usuario != null) 
             {
                 return Response.ok(usuario).build();
@@ -49,12 +44,19 @@ public class UsuariosResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response registrarGamer(UsuarioComunGamerDTO gamer) 
     {
-        var resultado = modeloGamer.registrarGamer(gamer);
-        if (resultado != null) 
+        try
         {
-            return Response.status(Response.Status.CREATED).entity(resultado).build();
+            var resultado = service.registrarGamer(gamer);
+            if (resultado != null) 
+            {
+                return Response.status(Response.Status.CREATED).entity(resultado).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo registrar el Usuario gamer").build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo registrar el Usuario gamer").build();
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
+        }
     }
     
     public static class RegistroEmpresaRequest
@@ -69,11 +71,22 @@ public class UsuariosResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response registrarEmpresa(RegistroEmpresaRequest request) 
     {
-        boolean exito = modeloEmpresa.registrarEmpresaYUsuario(request.empresa, request.usuario);
-        if (exito) 
+        try 
         {
-            return Response.status(Response.Status.CREATED).entity("Exito: Empresa creada exitosamente").build();
+            if (request == null || request.empresa == null || request.usuario == null) 
+            {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error: Datos de registro incompletos.").build();
+            }
+            boolean exito = service.registrarEmpresa(request.empresa, request.usuario);
+            if (exito) 
+            {
+                return Response.status(Response.Status.CREATED).entity("Exito: Empresa y usuario administrador creados exitosamente").build();
+            }
+            return Response.serverError().entity("Error: No se pudo registrar la empresa. Intente nuevamente.").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity("Error: Error al crear empresa").build();
     }
 }

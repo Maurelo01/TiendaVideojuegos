@@ -1,7 +1,7 @@
 package com.mycompany.tiendavideojuegos.resources;
 
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
-import com.mycompany.tiendavideojuegos.models.Videojuegos;
+import com.mycompany.tiendavideojuegos.services.VideojuegosService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -14,18 +14,25 @@ import jakarta.ws.rs.core.Response;
 @Path("videojuegos")
 public class VideojuegosResource 
 {
-    private final Videojuegos modelo = new Videojuegos();
-
+    private final VideojuegosService service = new VideojuegosService();
+    
     @POST // /api/videojuegos (Publicar juego completo)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response publicarJuego(VideojuegosDTO juego) 
     {
-        if (modelo.publicar(juego)) 
+        try
         {
-            return Response.status(Response.Status.CREATED).entity("Exito: Juego publicado").build();
+            if (service.publicarJuego(juego)) 
+            {
+                return Response.status(Response.Status.CREATED).entity("Exito: Juego publicado").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: Error al publicar").build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity("Error: Error al publicar").build();
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
+        }
     }
     
     @GET // /api/videojuegos/empresa/{id}
@@ -33,19 +40,34 @@ public class VideojuegosResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response obtenerPorEmpresa(@PathParam("id") int idEmpresa) 
     {
-        return Response.ok(modelo.listarPorEmpresa(idEmpresa)).build();
+        try 
+        {
+            return Response.ok(service.obtenerJuegosPorEmpresa(idEmpresa)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
     }
     
     @POST
     @Path("{id}") // /api/videojuegos/{id}
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editarJuego(@PathParam("id") int id, VideojuegosDTO juego) {
-        juego.setIdJuego(id);
-        if (modelo.editar(juego)) 
+    public Response editarJuego(@PathParam("id") int id, VideojuegosDTO juego) 
+    {
+        try 
         {
-            return Response.ok("Exito: Juego actualizado exitosamente").build();
+            juego.setIdJuego(id);
+            if (service.editarJuego(juego)) 
+            {
+                return Response.ok("Exito: Juego actualizado exitosamente").build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: No se encontró el juego o no se pudo actualizar.").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
         }
-        return Response.status(Response.Status.BAD_REQUEST).entity("error: No se pudo actualizar el juego. Verifique el id.").build();
     }
 }
