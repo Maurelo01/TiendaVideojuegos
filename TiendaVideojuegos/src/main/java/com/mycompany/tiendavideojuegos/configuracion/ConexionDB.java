@@ -6,45 +6,45 @@ import java.sql.SQLException;
 
 public class ConexionDB 
 {
-    private Connection conn;
-    private String url = "jdbc:mysql://localhost:3306/TiendaDB";
-    private String usuario = "root";
-    private String contraseña = "12345";
-    
-    public Connection conectar()
+    private static ConexionDB instance;
+    private Connection connection;
+    private static final String URL = "jdbc:mysql://localhost:3306/TiendaDB";
+    private static final String USUARIO = "root";
+    private static final String CONTRASEÑA = "12345";
+
+    private ConexionDB() 
     {
-        try
+        try 
         {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url, usuario, contraseña);
-            System.out.println("Conexión exitosa a TiendaDB");
-            return conn;
-        }
-        catch (SQLException e)
-        {
-            System.err.println("Error al conectar: " + e.getMessage());
-            return null;
+            this.connection = DriverManager.getConnection(URL, USUARIO, CONTRASEÑA);
+            System.out.println("Conexión establecida con TiendaDB");
         } 
-        catch (ClassNotFoundException ex) 
+        catch (ClassNotFoundException | SQLException ex) 
         {
-            System.err.println("Error al cargar: " + ex.getMessage());
-            return null;
+            System.err.println("Error al conectar con la DB: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
-    
-    public void desconectar(Connection c) 
+
+    public static ConexionDB getInstance() 
     {
-        if (c != null) 
+        try 
         {
-            try 
+            if (instance == null || instance.getConnection().isClosed()) 
             {
-                c.close();
-                System.out.println("Conexión cerrada");
-            } 
-            catch (SQLException e) 
-            {
-                System.err.println("Error al cerrar conexión: " + e.getMessage());
+                instance = new ConexionDB();
             }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
         }
+        return instance;
+    }
+
+    public Connection getConnection() 
+    {
+        return connection;
     }
 }

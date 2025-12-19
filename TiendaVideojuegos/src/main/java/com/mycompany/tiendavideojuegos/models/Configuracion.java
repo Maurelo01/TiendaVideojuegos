@@ -2,68 +2,65 @@ package com.mycompany.tiendavideojuegos.models;
 
 import com.mycompany.tiendavideojuegos.DTO.ConfiguracionDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class Configuracion
 {
     public ConfiguracionDTO obtenerConfiguracion()
     {
-        ConexionDB connMySQL = new ConexionDB();
-        var conn = connMySQL.conectar();
+        Connection conn = ConexionDB.getInstance().getConnection();
         ConfiguracionDTO configuracion = null;
         try
         {
-            var ps = conn.prepareStatement("SELECT * FROM Configuracion_Sistema LIMIT 1");
-            var rs = ps.executeQuery();
-            if (rs.next())
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Configuracion_Sistema LIMIT 1"); ResultSet rs = ps.executeQuery()) 
             {
-                configuracion = new ConfiguracionDTO();
-                configuracion.setIdConfiguracion(rs.getInt("id_config"));
-                configuracion.setComisionGlobalActual(rs.getFloat("comision_global_actual"));
+                if (rs.next())
+                {
+                    configuracion = new ConfiguracionDTO();
+                    configuracion.setIdConfiguracion(rs.getInt("id_config"));
+                    configuracion.setComisionGlobalActual(rs.getFloat("comision_global_actual"));
+                }
             }
-            rs.close();
-            ps.close();
         }
         catch (Exception e)
         {
             System.err.println("Error obteniendo configuración: " + e.getMessage());
-        }
-        finally
-        {
-            connMySQL.desconectar(conn);
         }
         return configuracion;
     }
     
     public boolean actualizarComisionGlobal(float nuevaComision) 
     {
-        ConexionDB connMySQL = new ConexionDB();
-        var conn = connMySQL.conectar();
+        Connection conn = ConexionDB.getInstance().getConnection();
         boolean exito = false;
         float valorAnterior = 0;
         try 
         {
             // Guardar valor anterior
-            var psLectura = conn.prepareStatement("SELECT comision_global_actual FROM Configuracion_Sistema LIMIT 1");
-            var rs = psLectura.executeQuery();
-            if (rs.next()) 
+            try (PreparedStatement psLectura = conn.prepareStatement("SELECT comision_global_actual FROM Configuracion_Sistema LIMIT 1"); java.sql.ResultSet rs = psLectura.executeQuery()) 
             {
-                valorAnterior = rs.getFloat("comision_global_actual");
+                if (rs.next())
+                {
+                    valorAnterior = rs.getFloat("comision_global_actual");
+                }
             }
-            rs.close();
-            psLectura.close();
             // Poner el nuevo valor
-            var psUpdate = conn.prepareStatement("UPDATE Configuracion_Sistema SET comision_global_actual = ?");
-            psUpdate.setFloat(1, nuevaComision);
-            psUpdate.executeUpdate();
-            psUpdate.close();
+            try (PreparedStatement psUpdate = conn.prepareStatement("UPDATE Configuracion_Sistema SET comision_global_actual = ?")) 
+            {
+                psUpdate.setFloat(1, nuevaComision);
+                psUpdate.executeUpdate();
+            }
             // Ajustar el porcentaje en las empresas
             try 
             {
                 // Si el porcentaje especifico > nueva global se baja al nuevo global
-                var psAjuste = conn.prepareStatement("UPDATE Empresa SET porcentaje_comision_especifica = ? WHERE porcentaje_comision_especifica > ?");
-                psAjuste.setFloat(1, nuevaComision);
-                psAjuste.setFloat(2, nuevaComision);
-                psAjuste.close();
+                try (PreparedStatement psAjuste = conn.prepareStatement("UPDATE Empresa SET porcentaje_comision_especifica = ? WHERE porcentaje_comision_especifica > ?")) 
+                {
+                    psAjuste.setFloat(1, nuevaComision);
+                    psAjuste.setFloat(2, nuevaComision);
+                }
                 exito = true;
             }
             catch (Exception e)
@@ -72,20 +69,17 @@ public class Configuracion
                 System.err.println("Error ajustando empresas, revirtiendo cambio");
                 if (valorAnterior != 0)
                 {
-                    var psRevertir = conn.prepareStatement("UPDATE Configuracion_Sistema SET comision_global_actual = ?");
-                    psRevertir.setFloat(1, valorAnterior);
-                    psRevertir.executeUpdate();
-                    psRevertir.close();
+                    try (PreparedStatement psRevertir = conn.prepareStatement("UPDATE Configuracion_Sistema SET comision_global_actual = ?")) 
+                    {
+                        psRevertir.setFloat(1, valorAnterior);
+                        psRevertir.executeUpdate();
+                    }
                 }
             }
         } 
         catch (Exception e) 
         {
             System.err.println("Error en actualización de comisión: " + e.getMessage());
-        }
-        finally
-        {
-            connMySQL.desconectar(conn);
         }
         return exito;
     }

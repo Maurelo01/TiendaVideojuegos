@@ -5,6 +5,7 @@ import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class Usuario 
@@ -27,43 +28,40 @@ public class Usuario
     
     public UsuarioDTO login(String correo, String contraseña)
     {
-        ConexionDB connMySQL = new ConexionDB();
-        var conn = connMySQL.conectar();
         UsuarioDTO usuarioDTO = null;
+        Connection conn = ConexionDB.getInstance().getConnection();
         try
         {
-            var ps = conn.prepareStatement("SELECT * FROM Usuario WHERE correo = ? AND contraseña = ?");
-            ps.setString(1, correo);
-            ps.setString(2, contraseña);
-            var rs = ps.executeQuery();
-                if (rs.next())
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Usuario WHERE correo = ? AND contraseña = ?")) 
+            {
+                ps.setString(1, correo);
+                ps.setString(2, contraseña);
+                try (ResultSet rs = ps.executeQuery()) 
                 {
-                    int idUsuario = rs.getInt("id_usuario");
-                    String rol = rs.getString("rol");
-                    if ("GAMER".equals(rol))
+                    if (rs.next())
                     {
-                        usuarioDTO = obtenerGamerCompleto(conn, idUsuario, rs);
-                    }
-                    else if ("EMPRESA".equals(rol))
-                    {
-                        usuarioDTO = obtenerEmpresaCompleto(conn, idUsuario, rs);
-                    }
-                    else
-                    {
-                        usuarioDTO = new UsuarioDTO();
-                        llenarDatos(usuarioDTO, rs);
+                        int idUsuario = rs.getInt("id_usuario");
+                        String rol = rs.getString("rol");
+                        if ("GAMER".equals(rol))
+                        {
+                            usuarioDTO = obtenerGamerCompleto(conn, idUsuario, rs);
+                        }
+                        else if ("EMPRESA".equals(rol))
+                        {
+                            usuarioDTO = obtenerEmpresaCompleto(conn, idUsuario, rs);
+                        }
+                        else
+                        {
+                            usuarioDTO = new UsuarioDTO();
+                            llenarDatos(usuarioDTO, rs);
+                        }
                     }
                 }
-            rs.close();
-            ps.close();
+            }
         }
         catch (Exception e)
         {
             System.err.println("Error en login: " + e.getMessage());
-        }
-        finally 
-        {
-            connMySQL.desconectar(conn);
         }
         return usuarioDTO;
     }
