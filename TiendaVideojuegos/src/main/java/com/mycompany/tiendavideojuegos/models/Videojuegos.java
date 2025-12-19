@@ -21,7 +21,7 @@ public class Videojuegos
         try 
         {
             // Insertar Juego
-            var ps = conn.prepareStatement("INSERT INTO Videojuego (id_empresa, titulo, descripcion, precio, recursos_minimos, clasificacion_edad, estado, fecha_publicacion, comentarios_estado) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)", Statement.RETURN_GENERATED_KEYS);
+            var ps = conn.prepareStatement("INSERT INTO Videojuego (id_empresa, titulo, descripcion, precio, recursos_minimos, clasificacion_edad, estado, fecha_publicacion, comentarios_estado, imagen_portada) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, juego.getIdEmpresa());
             ps.setString(2, juego.getTitulo());
             ps.setString(3, juego.getDescripcion());
@@ -30,6 +30,15 @@ public class Videojuegos
             ps.setString(6, juego.getClasificacionEdad());
             ps.setString(7, "ACTIVO");
             ps.setBoolean(8, true);
+            if (juego.getImagen() != null && !juego.getImagen().isEmpty()) 
+            {
+                byte[] imagenBytes = java.util.Base64.getDecoder().decode(juego.getImagen());
+                ps.setBytes(9, imagenBytes);
+            } 
+            else 
+            {
+                ps.setNull(9, java.sql.Types.BLOB);
+            }
             int filas = ps.executeUpdate();
             if (filas == 0) 
             {

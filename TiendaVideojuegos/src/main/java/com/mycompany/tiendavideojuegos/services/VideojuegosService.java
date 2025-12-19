@@ -14,14 +14,7 @@ public class VideojuegosService
     public boolean publicarJuego(VideojuegosDTO juego) throws Exception
     {
         validarDatosComunes(juego);
-        if (juego.getIdEmpresa() <= 0) 
-        {
-            throw new Exception("El juego debe estar asociado a una empresa válida.");
-        }
-        if (juego.getEstado() == null || juego.getEstado().isEmpty()) 
-        {
-            juego.setEstado("ACTIVO");
-        }
+        
         return modelo.publicar(juego);
     }
     
@@ -79,6 +72,21 @@ public class VideojuegosService
         if (juego.getClasificacionEdad() == null || !CLASIFICACIONES_VALIDAS.contains(juego.getClasificacionEdad().toUpperCase())) 
         {
             throw new Exception("Clasificación de edad inválida. Valores permitidos: " + CLASIFICACIONES_VALIDAS);
+        }
+        
+        if (juego.getImagen() == null || juego.getImagen().isEmpty()) 
+        {
+            throw new Exception("Es obligatorio subir una imagen de portada.");
+        }
+        
+        if (juego.getIdEmpresa() <= 0) 
+        {
+            throw new Exception("El juego debe estar asociado a una empresa válida.");
+        }
+        
+        if (juego.getEstado() == null || juego.getEstado().isEmpty()) 
+        {
+            juego.setEstado("ACTIVO");
         }
     }
     
