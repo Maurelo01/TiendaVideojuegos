@@ -1,6 +1,8 @@
 package com.mycompany.tiendavideojuegos.resources;
 
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
+import com.mycompany.tiendavideojuegos.DTO.SolicitudLogin;
+import com.mycompany.tiendavideojuegos.DTO.SolicitudRegistroEmpresa;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
@@ -21,7 +23,7 @@ public class UsuariosResource
     @Path("login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(UsuarioDTO credenciales)
+    public Response login(SolicitudLogin credenciales)
     {
         try 
         {
@@ -59,34 +61,28 @@ public class UsuariosResource
         }
     }
     
-    public static class RegistroEmpresaRequest
-    {
-        public EmpresaDTO empresa;
-        public UsuarioEmpresaDTO usuario;
-    }
-    
     @POST // /api/usuarios/registro/empresa
     @Path("registro/empresa")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registrarEmpresa(RegistroEmpresaRequest request) 
+    public Response registrarEmpresa(SolicitudRegistroEmpresa request) 
     {
         try 
         {
-            if (request == null || request.empresa == null || request.usuario == null) 
+            if (request == null || request.getEmpresa() == null || request.getUsuario() == null) 
             {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Error: Datos de registro incompletos.").build();
+                return Response.status(Response.Status.BAD_REQUEST).entity("Datos incompletos").build();
             }
-            boolean exito = service.registrarEmpresa(request.empresa, request.usuario);
+            boolean exito = service.registrarEmpresa(request.getEmpresa(), request.getUsuario());
             if (exito) 
             {
-                return Response.status(Response.Status.CREATED).entity("Exito: Empresa y usuario administrador creados exitosamente").build();
+                return Response.status(Response.Status.CREATED).entity("Exito: Empresa creada").build();
             }
-            return Response.serverError().entity("Error: No se pudo registrar la empresa. Intente nuevamente.").build();
-        } 
+            return Response.serverError().entity("Error al crear empresa").build();
+        }
         catch (Exception e) 
         {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error validación: " + e.getMessage()).build();
         }
     }
 }

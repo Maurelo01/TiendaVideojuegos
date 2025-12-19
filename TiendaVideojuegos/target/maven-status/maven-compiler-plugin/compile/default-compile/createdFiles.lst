@@ -3,6 +3,7 @@ com/mycompany/tiendavideojuegos/resources/VideojuegosResource.class
 com/mycompany/tiendavideojuegos/DTO/MultimediaDTO.class
 com/mycompany/tiendavideojuegos/configuracion/ConexionDB.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.class
+com/mycompany/tiendavideojuegos/DTO/SolicitudRegistroEmpresa.class
 com/mycompany/tiendavideojuegos/models/UsuarioComunGamer.class
 com/mycompany/tiendavideojuegos/models/Usuario.class
 com/mycompany/tiendavideojuegos/DTO/VideojuegosDTO.class
@@ -19,8 +20,8 @@ com/mycompany/tiendavideojuegos/services/VideojuegosService.class
 com/mycompany/tiendavideojuegos/DTO/ConfiguracionDTO.class
 com/mycompany/tiendavideojuegos/DTO/BannerDTO.class
 com/mycompany/tiendavideojuegos/resources/UsuariosResource.class
+com/mycompany/tiendavideojuegos/DTO/SolicitudLogin.class
 com/mycompany/tiendavideojuegos/models/Videojuegos.class
 com/mycompany/tiendavideojuegos/models/UsuarioEmpresa.class
 com/mycompany/tiendavideojuegos/services/UsuariosService.class
 com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.class
-com/mycompany/tiendavideojuegos/resources/UsuariosResource$RegistroEmpresaRequest.class
