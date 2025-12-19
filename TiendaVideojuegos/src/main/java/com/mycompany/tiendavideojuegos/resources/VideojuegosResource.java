@@ -10,6 +10,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 
 @Path("videojuegos")
 public class VideojuegosResource 
@@ -47,6 +48,21 @@ public class VideojuegosResource
         catch (Exception e) 
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET // /api/videojuegos
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarCatalogo() 
+    {
+        try 
+        {
+            List<VideojuegosDTO> juegos = service.obtenerJuegosPublicos();
+            return Response.ok(juegos).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().entity("Error al cargar catálogo").build();
         }
     }
     
