@@ -100,7 +100,15 @@ public class UsuariosService
     private boolean esFechaValida(Date fechaNacimiento) 
     {
         if (fechaNacimiento == null) return false;
-        LocalDate fechaNac = fechaNacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate fechaNac;
+        if (fechaNacimiento instanceof java.sql.Date) 
+        {
+            fechaNac = ((java.sql.Date) fechaNacimiento).toLocalDate();
+        } 
+        else 
+        {
+            fechaNac = fechaNacimiento.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
         LocalDate ahora = LocalDate.now();
         if (fechaNac.isAfter(ahora)) return false;
         return true;
