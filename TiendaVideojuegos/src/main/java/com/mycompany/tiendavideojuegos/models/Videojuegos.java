@@ -3,6 +3,9 @@ package com.mycompany.tiendavideojuegos.models;
 import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +14,7 @@ public class Videojuegos
 {
     public boolean publicar(VideojuegosDTO juego) 
     {
-        ConexionDB connMySQL = new ConexionDB();
-        var conn = connMySQL.conectar();
+        Connection conn = ConexionDB.getInstance().getConnection();
         boolean exito = false;
         int idJuegoGenerado = -1; // guardar id 
         try 
@@ -44,33 +46,35 @@ public class Videojuegos
                 // Insertar multimedia
                 if (juego.getMultimedia() != null && !juego.getMultimedia().isEmpty()) 
                 {
-                    var psMedia = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)");
-                    for (MultimediaDTO media : juego.getMultimedia()) 
+                    try (PreparedStatement psMedia = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)")) 
                     {
-                        psMedia.setInt(1, idJuegoGenerado);
-                        psMedia.setString(2, media.getUrl());
-                        psMedia.setString(3, media.getTipo());
-                        if (psMedia.executeUpdate() == 0) 
+                        for (MultimediaDTO media : juego.getMultimedia()) 
                         {
-                            throw new Exception("Error insertando multimedia");
+                            psMedia.setInt(1, idJuegoGenerado);
+                            psMedia.setString(2, media.getUrl());
+                            psMedia.setString(3, media.getTipo());
+                            if (psMedia.executeUpdate() == 0)
+                            {
+                                throw new Exception("Error insertando multimedia");
+                            }
                         }
                     }
-                    psMedia.close();
                 }
                 // Insertar categorias
                 if (juego.getIdsCategorias() != null && !juego.getIdsCategorias().isEmpty()) 
                 {
-                    var psCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)");
-                    for (Integer idCat : juego.getIdsCategorias())
+                    try (PreparedStatement psCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)")) 
                     {
-                        psCat.setInt(1, idJuegoGenerado);
-                        psCat.setInt(2, idCat);
-                        if (psCat.executeUpdate() == 0) 
+                        for (Integer idCat : juego.getIdsCategorias()) 
                         {
-                            throw new Exception("Error insertando categoría");
+                            psCat.setInt(1, idJuegoGenerado);
+                            psCat.setInt(2, idCat);
+                            if (psCat.executeUpdate() == 0)
+                            {
+                                throw new Exception("Error insertando categoría");
+                            }
                         }
                     }
-                    psCat.close();
                 }
                 exito = true;
             }
@@ -83,10 +87,11 @@ public class Videojuegos
             {
                 try 
                 {
-                    var psDel = conn.prepareStatement("DELETE FROM Videojuego WHERE id_juego = ?");
-                    psDel.setInt(1, idJuegoGenerado);
-                    psDel.executeUpdate();
-                    psDel.close();
+                    try (java.sql.PreparedStatement psDel = conn.prepareStatement("DELETE FROM Videojuego WHERE id_juego = ?")) 
+                    {
+                        psDel.setInt(1, idJuegoGenerado);
+                        psDel.executeUpdate();
+                    }
                     System.out.println("Se eliminó el registro del videojuego por error en añadir sus recursos.");
                 } 
                 catch (Exception ex) 
@@ -95,122 +100,115 @@ public class Videojuegos
                 }
             }
         }
-        finally 
-        {
-            connMySQL.desconectar(conn);
-        }
         return exito;
     }
     
     public List<VideojuegosDTO> listarPorEmpresa(int idEmpresa) 
     {
-        ConexionDB connMySQL = new ConexionDB();
-        var conn = connMySQL.conectar();
+        Connection conn = ConexionDB.getInstance().getConnection();
         List<VideojuegosDTO> lista = new ArrayList<>();
         try 
         {
-            var ps = conn.prepareStatement("SELECT * FROM Videojuego WHERE id_empresa = ?");
-            ps.setInt(1, idEmpresa);
-            var rs = ps.executeQuery();
-            while (rs.next()) 
-            {
-                var videojuego = new VideojuegosDTO();
-                videojuego.setIdJuego(rs.getInt("id_juego"));
-                videojuego.setIdEmpresa(rs.getInt("id_empresa"));
-                videojuego.setTitulo(rs.getString("titulo"));
-                videojuego.setDescripcion(rs.getString("descripcion"));
-                videojuego.setPrecio(rs.getFloat("precio"));
-                videojuego.setRecursosMinimos(rs.getString("recursos_minimos"));
-                videojuego.setClasificacionEdad(rs.getString("clasificacion_edad"));
-                videojuego.setEstado(rs.getString("estado"));
-                videojuego.setFechaPublicacion(rs.getDate("fecha_publicacion"));
-                videojuego.setComentariosEstado(rs.getBoolean("comentarios_estado"));
-                lista.add(videojuego);
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Videojuego WHERE id_empresa = ?")) {
+                ps.setInt(1, idEmpresa);
+                try (java.sql.ResultSet rs = ps.executeQuery()) 
+                {
+                    while (rs.next())
+                    {
+                        var videojuego = new VideojuegosDTO();
+                        videojuego.setIdJuego(rs.getInt("id_juego"));
+                        videojuego.setIdEmpresa(rs.getInt("id_empresa"));
+                        videojuego.setTitulo(rs.getString("titulo"));
+                        videojuego.setDescripcion(rs.getString("descripcion"));
+                        videojuego.setPrecio(rs.getFloat("precio"));
+                        videojuego.setRecursosMinimos(rs.getString("recursos_minimos"));
+                        videojuego.setClasificacionEdad(rs.getString("clasificacion_edad"));
+                        videojuego.setEstado(rs.getString("estado"));
+                        videojuego.setFechaPublicacion(rs.getDate("fecha_publicacion"));
+                        videojuego.setComentariosEstado(rs.getBoolean("comentarios_estado"));
+                        lista.add(videojuego);
+                    }
+                }
             }
-            rs.close();
-            ps.close();
         }
         catch (Exception e) 
         {
             System.err.println("Error listando juegos: " + e.getMessage());
-        }
-        finally
-        {
-            connMySQL.desconectar(conn);
         }
         return lista;
     }
     
     public boolean editar(VideojuegosDTO juego)
     {
-        ConexionDB connMySQL = new ConexionDB();
-        var conn = connMySQL.conectar();
+        Connection conn = ConexionDB.getInstance().getConnection();
         boolean exito = false;
         try
         {
-            var ps = conn.prepareStatement("UPDATE Videojuego SET titulo=?, descripcion=?, precio=?, recursos_minimos=?, clasificacion_edad=?, comentarios_estado=? WHERE id_juego=?");
-            ps.setString(1, juego.getTitulo());
-            ps.setString(2, juego.getDescripcion());
-            ps.setFloat(3, juego.getPrecio());
-            ps.setString(4, juego.getRecursosMinimos());
-            ps.setString(5, juego.getClasificacionEdad());
-            ps.setBoolean(6, juego.isComentariosEstado());
-            ps.setInt(7, juego.getIdJuego());
-            int filas = ps.executeUpdate();
-            ps.close();
+            int filas;
+            try (java.sql.PreparedStatement ps = conn.prepareStatement("UPDATE Videojuego SET titulo=?, descripcion=?, precio=?, recursos_minimos=?, clasificacion_edad=?, comentarios_estado=? WHERE id_juego=?")) 
+            {
+                ps.setString(1, juego.getTitulo());
+                ps.setString(2, juego.getDescripcion());
+                ps.setFloat(3, juego.getPrecio());
+                ps.setString(4, juego.getRecursosMinimos());
+                ps.setString(5, juego.getClasificacionEdad());
+                ps.setBoolean(6, juego.isComentariosEstado());
+                ps.setInt(7, juego.getIdJuego());
+                filas = ps.executeUpdate();
+            }
             if(filas > 0)
             {
                 if (juego.getIdsCategorias() != null) 
                 {
                     // Actualizar categorias
-                    var psDelCat = conn.prepareStatement("DELETE FROM Juego_Categoria WHERE id_juego = ?");
-                    psDelCat.setInt(1, juego.getIdJuego());
-                    psDelCat.executeUpdate();
-                    psDelCat.close();
+                    try (PreparedStatement psDelCat = conn.prepareStatement("DELETE FROM Juego_Categoria WHERE id_juego = ?")) 
+                    {
+                        psDelCat.setInt(1, juego.getIdJuego());
+                        psDelCat.executeUpdate();
+                    }
                     // Insertar nuevas categorias 
                     if (!juego.getIdsCategorias().isEmpty()) 
                     {
-                        var psInsCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)");
-                        for (Integer idCat : juego.getIdsCategorias()) 
+                        try (java.sql.PreparedStatement psInsCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)")) 
                         {
-                            psInsCat.setInt(1, juego.getIdJuego());
-                            psInsCat.setInt(2, idCat);
-                            psInsCat.executeUpdate();
+                            for (Integer idCat : juego.getIdsCategorias())
+                            {
+                                psInsCat.setInt(1, juego.getIdJuego());
+                                psInsCat.setInt(2, idCat);
+                                psInsCat.executeUpdate();
+                            }
                         }
-                        psInsCat.close();
                     }
                 }
                 if (juego.getMultimedia() != null) 
                 {
                     // Borrar multimedia antigua
-                    var psDelMedia = conn.prepareStatement("DELETE FROM Multimedia WHERE id_juego = ?");
-                    psDelMedia.setInt(1, juego.getIdJuego());
-                    psDelMedia.executeUpdate();
-                    psDelMedia.close();
+                    try (PreparedStatement psDelMedia = conn.prepareStatement("DELETE FROM Multimedia WHERE id_juego = ?")) 
+                    {
+                        psDelMedia.setInt(1, juego.getIdJuego());
+                        psDelMedia.executeUpdate();
+                    }
                     // Insertar nueva
                     if (!juego.getMultimedia().isEmpty()) 
                     {
-                        var psInsMed = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)");
-                        for (MultimediaDTO media : juego.getMultimedia()) 
+                        try (PreparedStatement psInsMed = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)")) 
                         {
-                            psInsMed.setInt(1, juego.getIdJuego());
-                            psInsMed.setString(2, media.getUrl());
-                            psInsMed.setString(3, media.getTipo());
-                            psInsMed.executeUpdate();
+                            for (MultimediaDTO media : juego.getMultimedia())
+                            {
+                                psInsMed.setInt(1, juego.getIdJuego());
+                                psInsMed.setString(2, media.getUrl());
+                                psInsMed.setString(3, media.getTipo());
+                                psInsMed.executeUpdate();
+                            }
                         }
-                        psInsMed.close();
                     }
                 }
                 exito = true;
             }
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
             System.err.println("Error al editar videojuego: " + e.getMessage());
-        }
-        finally 
-        {
-            connMySQL.desconectar(conn);
         }
         return exito;
     }
