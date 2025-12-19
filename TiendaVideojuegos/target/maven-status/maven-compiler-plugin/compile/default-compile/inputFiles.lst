@@ -24,4 +24,5 @@
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/models/UsuarioEmpresa.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/ConfiguracionDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/VideojuegosDTO.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/configuracion/CorsFilter.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/AdminResource.java
