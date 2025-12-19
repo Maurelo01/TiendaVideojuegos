@@ -5,6 +5,7 @@ import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -134,6 +135,43 @@ public class Videojuegos
         catch (Exception e) 
         {
             System.err.println("Error listando juegos: " + e.getMessage());
+        }
+        return lista;
+    }
+    
+    public List<VideojuegosDTO> listarActivos() 
+    {
+        List<VideojuegosDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Videojuego WHERE estado = 'ACTIVO'"); ResultSet rs = ps.executeQuery()) 
+        {
+            while (rs.next()) 
+            {
+                VideojuegosDTO juego = new VideojuegosDTO();
+                juego.setIdJuego(rs.getInt("id_juego"));
+                juego.setIdEmpresa(rs.getInt("id_empresa"));
+                juego.setTitulo(rs.getString("titulo"));
+                juego.setDescripcion(rs.getString("descripcion"));
+                juego.setPrecio(rs.getFloat("precio"));
+                juego.setRecursosMinimos(rs.getString("recursos_minimos"));
+                juego.setClasificacionEdad(rs.getString("clasificacion_edad"));
+                juego.setEstado(rs.getString("estado"));
+                byte[] imgBytes = rs.getBytes("imagen_portada");
+                if (imgBytes != null && imgBytes.length > 0) 
+                {
+                    String base64 = java.util.Base64.getEncoder().encodeToString(imgBytes);
+                    juego.setImagen(base64);
+                } 
+                else 
+                {
+                    juego.setImagen(null);
+                }
+                lista.add(juego);
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error listando juegos activos: " + e.getMessage());
         }
         return lista;
     }

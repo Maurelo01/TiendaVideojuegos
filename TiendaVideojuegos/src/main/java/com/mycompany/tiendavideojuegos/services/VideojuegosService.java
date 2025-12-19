@@ -2,6 +2,7 @@ package com.mycompany.tiendavideojuegos.services;
 
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.models.Videojuegos;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -79,5 +80,15 @@ public class VideojuegosService
         {
             throw new Exception("Clasificación de edad inválida. Valores permitidos: " + CLASIFICACIONES_VALIDAS);
         }
+    }
+    
+    public List<VideojuegosDTO> obtenerJuegosPublicos() 
+    {
+        List<VideojuegosDTO> lista = modelo.listarActivos();
+        if (lista == null) 
+        {
+            return new ArrayList<>(); 
+        }   
+        return modelo.listarActivos();
     }
 }

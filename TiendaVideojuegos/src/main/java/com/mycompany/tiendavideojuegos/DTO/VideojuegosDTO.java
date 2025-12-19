@@ -1,10 +1,11 @@
 package com.mycompany.tiendavideojuegos.DTO;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideojuegosDTO 
+public class VideojuegosDTO implements Serializable
 {
     private int idJuego;
     private int idEmpresa;
@@ -17,6 +18,7 @@ public class VideojuegosDTO
     private Date fechaPublicacion;
     private boolean comentariosEstado;
     private String nombreEmpresa;
+    private String imagen;
     private List<MultimediaDTO> multimedia = new ArrayList<>();
     private List<Integer> idsCategorias = new ArrayList<>();
     
@@ -127,6 +129,16 @@ public class VideojuegosDTO
     public void setNombreEmpresa(String nombreEmpresa)
     {
         this.nombreEmpresa = nombreEmpresa;
+    }
+    
+    public String getImagen() 
+    {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) 
+    {
+        this.imagen = imagen;
     }
     
     public List<MultimediaDTO> getMultimedia() 
