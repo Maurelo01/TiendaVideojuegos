@@ -103,4 +103,27 @@ public class Categoria
         }
         return exito;
     }
+    
+    public boolean existe(String nombreCategoria) 
+    {
+        boolean existe = false;
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM Categoria WHERE nombre_categoria = ?")) 
+        {
+            ps.setString(1, nombreCategoria);
+            
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    existe = rs.getInt(1) > 0;
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error al verificar existencia de categoría: " + e.getMessage());
+        }
+        return existe;
+    }
 }
