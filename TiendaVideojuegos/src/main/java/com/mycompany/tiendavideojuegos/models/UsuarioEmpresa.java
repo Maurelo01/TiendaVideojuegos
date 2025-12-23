@@ -6,6 +6,7 @@ import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class UsuarioEmpresa
@@ -88,5 +89,70 @@ public class UsuarioEmpresa
             }
         }
         return exito;
+    }
+    
+    public boolean agregarEmpleado(int idEmpresaExistente, UsuarioEmpresaDTO nuevoUsuario) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        int idUsuarioGenerado = -1;
+        try 
+        {
+            try (PreparedStatement psUser = conn.prepareStatement( "INSERT INTO Usuario (correo, contraseña, rol) VALUES (?, ?, 'EMPRESA')", Statement.RETURN_GENERATED_KEYS)) 
+            {
+                psUser.setString(1, nuevoUsuario.getCorreo());
+                psUser.setString(2, nuevoUsuario.getContraseña());
+                int filasAfectadas = psUser.executeUpdate();
+                if (filasAfectadas == 0) 
+                {
+                    throw new SQLException("No se pudo crear el usuario, ninguna fila afectada.");
+                }
+
+                try (ResultSet rs = psUser.getGeneratedKeys()) 
+                {
+                    if (rs.next()) 
+                    {
+                        idUsuarioGenerado = rs.getInt(1);
+                    } 
+                    else 
+                    {
+                        throw new SQLException("No se pudo obtener el id del usuario creado.");
+                    }
+                }
+            }
+            if (idUsuarioGenerado != -1)
+            {
+                try (PreparedStatement psUnir = conn.prepareStatement("INSERT INTO Usuario_Empresa (id_usuario, id_empresa, nombre_empleado, fecha_nacimiento_empleado) VALUES (?, ?, ?, ?)")) 
+                {
+                    psUnir.setInt(1, idUsuarioGenerado);
+                    psUnir.setInt(2, idEmpresaExistente);
+                    psUnir.setString(3, nuevoUsuario.getNombreEmpleado());
+                    psUnir.setDate(4, nuevoUsuario.getFechaNacimiento());
+                    psUnir.executeUpdate();
+                    return true;
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error en la agregar empleado: " + e.getMessage());
+            if (idUsuarioGenerado != -1) 
+            {
+                try 
+                {
+                    System.out.println("Intentando borrar usuario id: " + idUsuarioGenerado);
+                    try (PreparedStatement psDelete = conn.prepareStatement("DELETE FROM Usuario WHERE id_usuario = ?")) 
+                    {
+                        psDelete.setInt(1, idUsuarioGenerado);
+                        psDelete.executeUpdate();
+                        System.out.println("Exito: Usuario borrado.");
+                    }
+                }
+                catch (SQLException ex) 
+                {
+                    System.err.println("CRÍTICO: No se pudo borrar la creación del usuario: " + ex.getMessage());
+                }
+            }
+        }
+        return false;
     }
 }
