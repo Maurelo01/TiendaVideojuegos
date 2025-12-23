@@ -10,6 +10,7 @@ import com.mycompany.tiendavideojuegos.services.UsuariosService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -83,6 +84,28 @@ public class UsuariosResource
         catch (Exception e) 
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Error validación: " + e.getMessage()).build();
+        }
+    }
+    
+    @POST
+    @Path("empresa/{id}/empleado") // /api/usuarios/empresa/{id}/empleado
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response agregarEmpleado(@PathParam("id") int idEmpresa, UsuarioEmpresaDTO empleado)
+    {
+        try 
+        {
+            boolean exito = service.agregarUsuarioAEmpresa(idEmpresa, empleado);
+            if (exito)
+            {
+                return Response.status(Response.Status.CREATED).entity("Exito: Empleado agregado a la empresa " + idEmpresa).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo agregar el empleado. Verifique que la empresa exista.").build();
+
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
         }
     }
 }

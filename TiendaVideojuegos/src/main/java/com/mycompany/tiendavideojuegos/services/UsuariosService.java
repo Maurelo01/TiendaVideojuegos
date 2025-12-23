@@ -36,7 +36,7 @@ public class UsuariosService
         {
             throw new Exception("El formato del correo electrónico no es válido.");
         }
-        if (gamer.getContraseña().length() < 5) 
+        if (gamer.getContraseña().length() < 8) 
         {
             throw new Exception("La contraseña debe tener al menos 8 caracteres.");
         }
@@ -112,5 +112,35 @@ public class UsuariosService
         LocalDate ahora = LocalDate.now();
         if (fechaNac.isAfter(ahora)) return false;
         return true;
+    }
+    
+    public boolean agregarUsuarioAEmpresa(int idEmpresa, UsuarioEmpresaDTO usuario) throws Exception
+    {
+        if (idEmpresa <= 0) 
+        {
+            throw new Exception("El ID de la empresa no es válido.");
+        }
+        
+        if (usuario.getCorreo() == null || !esCorreoValido(usuario.getCorreo())) 
+        {
+            throw new Exception("El correo electrónico no es válido.");
+        }
+        
+        if (usuario.getContraseña() == null || usuario.getContraseña().length() < 8)
+        {
+            throw new Exception("La contraseña debe tener al menos 5 caracteres.");
+        }
+        
+        if (usuario.getNombreEmpleado() == null || usuario.getNombreEmpleado().trim().isEmpty())
+        {
+            throw new Exception("El nombre del empleado es obligatorio.");
+        }
+        
+        if (usuario.getFechaNacimiento() == null)
+        {
+            throw new Exception("La fecha de nacimiento es obligatoria.");
+        }
+
+        return empresaModel.agregarEmpleado(idEmpresa, usuario);
     }
 }
