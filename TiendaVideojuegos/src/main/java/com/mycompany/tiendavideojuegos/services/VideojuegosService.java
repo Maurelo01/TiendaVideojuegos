@@ -14,7 +14,6 @@ public class VideojuegosService
     public boolean publicarJuego(VideojuegosDTO juego) throws Exception
     {
         validarDatosComunes(juego);
-        
         return modelo.publicar(juego);
     }
     
