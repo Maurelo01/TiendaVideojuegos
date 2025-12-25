@@ -21,18 +21,7 @@ public class AdminService
     
     public boolean crearCategoria(CategoriaDTO cat) throws Exception
     {
-        if (cat.getNombreCategoria() == null || cat.getNombreCategoria().trim().isEmpty()) 
-        {
-            throw new Exception("El nombre de la categoría es obligatorio.");
-        }
-        if (cat.getNombreCategoria().length() > 150) 
-        {
-            throw new Exception("El nombre de la categoría no puede exceder los 150 caracteres.");
-        }
-        if (modeloCat.existe(cat.getNombreCategoria())) 
-        {
-            throw new Exception("Ya existe una categoría con el nombre: " + cat.getNombreCategoria());
-        }
+        validarDatosComunes(cat);
         return modeloCat.crear(cat);
     }
     
@@ -58,5 +47,45 @@ public class AdminService
     public boolean agregarBanner(BannerDTO banner) 
     {
         return modeloBanner.agregar(banner);
+    }
+    
+    public boolean editarCategoria(CategoriaDTO cat) throws Exception
+    {
+        if (cat.getIdCategoria() <= 0) 
+        {
+            throw new Exception("El id de la categoría no es válido.");
+        }
+        validarDatosComunes(cat);
+        return modeloCat.actualizar(cat);
+    }
+    
+    public boolean eliminarCategoria(int idCategoria, boolean forzarBorrado) throws Exception
+    {
+        if (idCategoria <= 0) 
+        {
+            throw new Exception("Id inválido.");
+        }
+        int juegosAfectados = modeloCat.contarJuegosPorCategoria(idCategoria);
+        if (juegosAfectados > 0 && !forzarBorrado) 
+        {
+            throw new Exception("Advertencia: Esta categoría está asignada a " + juegosAfectados +" juegos. Si se elimina se desvinculará de ellos, ¿Desea continuar?");
+        }
+        return modeloCat.eliminar(idCategoria);
+    }
+    
+    private void validarDatosComunes(CategoriaDTO cat) throws Exception 
+    {
+        if (cat.getNombreCategoria() == null || cat.getNombreCategoria().trim().isEmpty()) 
+        {
+            throw new Exception("El nombre de la categoría es obligatorio.");
+        }
+        if (cat.getNombreCategoria().length() > 150) 
+        {
+            throw new Exception("El nombre de la categoría no puede exceder los 150 caracteres.");
+        }
+        if (modeloCat.existe(cat.getNombreCategoria())) 
+        {
+            throw new Exception("Ya existe una categoría con el nombre: " + cat.getNombreCategoria());
+        }
     }
 }

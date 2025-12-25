@@ -126,4 +126,27 @@ public class Categoria
         }
         return existe;
     }
+    
+    public int contarJuegosPorCategoria(int idCategoria) 
+    {
+        int cantidad = 0;
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String sql = "SELECT COUNT(*) FROM Juego_Categoria WHERE id_categoria = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) 
+        {
+            ps.setInt(1, idCategoria);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    cantidad = rs.getInt(1);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error contando juegos por categoría: " + e.getMessage());
+        }
+        return cantidad;
+    }
 }

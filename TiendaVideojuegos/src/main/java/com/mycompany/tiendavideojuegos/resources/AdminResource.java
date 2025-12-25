@@ -5,10 +5,14 @@ import com.mycompany.tiendavideojuegos.DTO.CategoriaDTO;
 import com.mycompany.tiendavideojuegos.DTO.ConfiguracionDTO;
 import com.mycompany.tiendavideojuegos.services.AdminService;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -53,11 +57,11 @@ public class AdminResource
         return Response.ok(service.obtenerConfiguracion()).build();
     }
     
-    @POST // /api/admin/config (Actualizar comisión y ajustar empresas)
+    @PUT // /api/admin/config (Actualizar comisión y ajustar empresas)
     @Path("config")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateConfig(ConfiguracionDTO config) 
+    public Response actualizarConfig(ConfiguracionDTO config) 
     {
         if(service.actualizarComisionGlobal(config.getComisionGlobalActual())) 
         {
@@ -78,9 +82,53 @@ public class AdminResource
     @Path("banner")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addBanner(BannerDTO banner) 
+    public Response añadirBanner(BannerDTO banner) 
     {
         if(service.agregarBanner(banner)) return Response.ok().build();
         return Response.serverError().build();
+    }
+    
+    @PUT
+    @Path("categorias/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editarCategoria(@PathParam("id") int id, CategoriaDTO cat) 
+    {
+        try 
+        {
+            cat.setIdCategoria(id); // Aseguramos que el DTO tenga el ID de la URL
+            if(service.editarCategoria(cat)) 
+            {
+                return Response.ok("Exito: Categoría actualizada correctamente").build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: No se encontró la categoría a editar.").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
+        }
+    }
+    
+    @DELETE
+    @Path("categorias/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response eliminarCategoria(@PathParam("id") int id, @QueryParam("confirmar") boolean confirmar)
+    {
+        try 
+        {
+            if(service.eliminarCategoria(id, confirmar)) 
+            {
+                return Response.ok("Exito: Categoría eliminada correctamente").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo eliminar la categoría.").build();
+        } 
+        catch (Exception e) 
+        {
+            if (e.getMessage().startsWith("ADVERTENCIA")) 
+            {
+                return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
     }
 }
