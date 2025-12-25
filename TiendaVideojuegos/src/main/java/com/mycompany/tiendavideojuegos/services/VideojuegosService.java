@@ -13,6 +13,10 @@ public class VideojuegosService
     
     public boolean publicarJuego(VideojuegosDTO juego) throws Exception
     {
+        if (juego.getImagen() == null || juego.getImagen().isEmpty()) 
+        {
+            throw new Exception("Es obligatorio subir una imagen de portada.");
+        }
         validarDatosComunes(juego);
         return modelo.publicar(juego);
     }
@@ -28,10 +32,6 @@ public class VideojuegosService
 
     public boolean editarJuego(VideojuegosDTO juego) throws Exception
     {
-        if (juego.getIdJuego() <= 0) 
-        {
-            throw new Exception("El ID del juego es inválido.");
-        }
         validarDatosComunes(juego);
         return modelo.editar(juego);
     }
@@ -73,14 +73,14 @@ public class VideojuegosService
             throw new Exception("Clasificación de edad inválida. Valores permitidos: " + CLASIFICACIONES_VALIDAS);
         }
         
-        if (juego.getImagen() == null || juego.getImagen().isEmpty()) 
-        {
-            throw new Exception("Es obligatorio subir una imagen de portada.");
-        }
-        
         if (juego.getIdEmpresa() <= 0) 
         {
             throw new Exception("El juego debe estar asociado a una empresa válida.");
+        }
+        
+        if (juego.getIdJuego() <= 0) 
+        {
+            throw new Exception("El id del juego es inválido.");
         }
         
         if (juego.getEstado() == null || juego.getEstado().isEmpty()) 
