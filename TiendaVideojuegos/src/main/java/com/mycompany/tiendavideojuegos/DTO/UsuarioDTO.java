@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class UsuarioDTO 
 {
     private int idUsuario;
+    private int idEmpresa;
     private String correo;
     private String contraseña;
     private String rol;
@@ -58,5 +59,15 @@ public class UsuarioDTO
     public void setFechaRegistro(Timestamp fechaRegistro) 
     { 
         this.fechaRegistro = fechaRegistro; 
+    }
+    
+    public int getIdEmpresa() 
+    { 
+        return idEmpresa; 
+    }
+    
+    public void setIdEmpresa(int idEmpresa)
+    {
+        this.idEmpresa = idEmpresa;
     }
 }
