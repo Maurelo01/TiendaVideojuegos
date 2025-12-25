@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsuarioEmpresa
 {
@@ -154,5 +156,74 @@ public class UsuarioEmpresa
             }
         }
         return false;
+    }
+
+    public boolean esEmpleadoDeEmpresa(int idUsuario, int idEmpresa) 
+    {
+        boolean esEmpleado = false;
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM Usuario_Empresa WHERE id_usuario = ? AND id_empresa = ?")) 
+        {
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idEmpresa);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    esEmpleado = true;
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error verificando empleado: " + e.getMessage());
+        }
+        return esEmpleado;
+    }
+    
+    public List<UsuarioEmpresaDTO> listarEmpleados(int idEmpresa) 
+    {
+        List<UsuarioEmpresaDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String sql = "SELECT u.id_usuario, u.correo, ue.nombre_empleado, ue.fecha_nacimiento_empleado FROM Usuario_Empresa ue JOIN Usuario u ON ue.id_usuario = u.id_usuario WHERE ue.id_empresa = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) 
+        {
+            ps.setInt(1, idEmpresa);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    UsuarioEmpresaDTO emp = new UsuarioEmpresaDTO();
+                    emp.setIdUsuario(rs.getInt("id_usuario"));
+                    emp.setCorreo(rs.getString("correo"));
+                    emp.setNombreEmpleado(rs.getString("nombre_empleado"));
+                    emp.setFechaNacimiento(rs.getDate("fecha_nacimiento_empleado"));
+                    lista.add(emp);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error listando empleados: " + e.getMessage());
+        }
+        return lista;
+    }
+    
+    public boolean eliminarUsuario(int idUsuario) 
+
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Usuario WHERE id_usuario = ?")) 
+        {
+            ps.setInt(1, idUsuario);
+            return ps.executeUpdate() > 0;
+        } 
+
+        catch (Exception e) 
+        {
+            System.err.println("Error eliminando usuario: " + e.getMessage());
+            return false;
+        }
+
     }
 }
