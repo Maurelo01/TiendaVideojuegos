@@ -92,12 +92,12 @@ public class AdminResource
     @Path("categorias/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response editarCategoria(@PathParam("id") int id, CategoriaDTO cat) 
+    public Response editarCategoria(@PathParam("id") int id, @QueryParam("confirmar") boolean confirmar, CategoriaDTO cat) 
     {
         try 
         {
-            cat.setIdCategoria(id); // Aseguramos que el DTO tenga el ID de la URL
-            if(service.editarCategoria(cat)) 
+            cat.setIdCategoria(id);
+            if(service.editarCategoria(cat, confirmar)) 
             {
                 return Response.ok("Exito: Categoría actualizada correctamente").build();
             }
@@ -105,6 +105,10 @@ public class AdminResource
         } 
         catch (Exception e) 
         {
+            if (e.getMessage().startsWith("Advertencia")) 
+            {
+                return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+            }
             return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
         }
     }
@@ -124,7 +128,7 @@ public class AdminResource
         } 
         catch (Exception e) 
         {
-            if (e.getMessage().startsWith("ADVERTENCIA")) 
+            if (e.getMessage().startsWith("Advertencia")) 
             {
                 return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
             }

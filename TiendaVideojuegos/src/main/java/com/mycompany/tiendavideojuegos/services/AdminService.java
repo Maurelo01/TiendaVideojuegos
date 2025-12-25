@@ -49,13 +49,18 @@ public class AdminService
         return modeloBanner.agregar(banner);
     }
     
-    public boolean editarCategoria(CategoriaDTO cat) throws Exception
+    public boolean editarCategoria(CategoriaDTO cat, boolean forzarEdicion) throws Exception
     {
         if (cat.getIdCategoria() <= 0) 
         {
             throw new Exception("El id de la categoría no es válido.");
         }
         validarDatosComunes(cat);
+        int juegosAfectados = modeloCat.contarJuegosPorCategoria(cat.getIdCategoria());
+        if (juegosAfectados > 0 && !forzarEdicion) 
+        {
+            throw new Exception("Advertencia: Estás editando una categoría usada por " + juegosAfectados + " juego(s). El cambio se mostrara en todos ellos, ¿Deseas continuar?");
+        }
         return modeloCat.actualizar(cat);
     }
     
@@ -68,7 +73,7 @@ public class AdminService
         int juegosAfectados = modeloCat.contarJuegosPorCategoria(idCategoria);
         if (juegosAfectados > 0 && !forzarBorrado) 
         {
-            throw new Exception("Advertencia: Esta categoría está asignada a " + juegosAfectados +" juegos. Si se elimina se desvinculará de ellos, ¿Desea continuar?");
+            throw new Exception("Advertencia: Esta categoría está asignada a " + juegosAfectados +" juego(s). Si se elimina se desvinculará de ellos, ¿Desea continuar?");
         }
         return modeloCat.eliminar(idCategoria);
     }
