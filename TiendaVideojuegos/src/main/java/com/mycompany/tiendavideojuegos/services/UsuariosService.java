@@ -10,6 +10,7 @@ import com.mycompany.tiendavideojuegos.models.UsuarioEmpresa;
 import java.util.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class UsuariosService 
@@ -148,5 +149,34 @@ public class UsuariosService
         }
 
         return empresaModel.agregarEmpleado(idEmpresa, usuario);
+    }
+
+    public List<UsuarioEmpresaDTO> listarEmpleados(int idEmpresa) throws Exception
+    {
+        if (idEmpresa <= 0) 
+        {
+            throw new Exception("El Id de la empresa no es válido.");
+        }
+        return empresaModel.listarEmpleados(idEmpresa);
+    }
+    
+    public boolean eliminarEmpleado(int idEmpresa, int idUsuarioEmpleado) throws Exception
+    {
+        if (idEmpresa <= 0 || idUsuarioEmpleado <= 0) 
+        {
+            throw new Exception("Ids inválidos.");
+        }
+
+        if (!empresaModel.esEmpleadoDeEmpresa(idUsuarioEmpleado, idEmpresa)) 
+        {
+            throw new Exception("El usuario no pertenece a esta empresa o no existe.");
+        }
+
+        List<UsuarioEmpresaDTO> empleados = empresaModel.listarEmpleados(idEmpresa);
+        if (empleados.size() <= 1) 
+        {
+            throw new Exception("No se puede eliminar al último empleado ya que la empresa debe mantener al menos un usuario activo.");
+        }
+        return empresaModel.eliminarUsuario(idUsuarioEmpleado);
     }
 }

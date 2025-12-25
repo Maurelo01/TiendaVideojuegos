@@ -8,6 +8,8 @@ import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
 import com.mycompany.tiendavideojuegos.services.UsuariosService;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -106,6 +108,44 @@ public class UsuariosResource
         catch (Exception e)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("empresa/{id}/empleados") // /api/usuarios/empresa/{id}/empleados
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarEmpleados(@PathParam("id") int idEmpresa) 
+    {
+        try 
+        {
+            return Response.ok(service.listarEmpleados(idEmpresa)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+
+    @DELETE
+    @Path("empresa/{idEmpresa}/empleado/{idEmpleado}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response eliminarEmpleado(@PathParam("idEmpresa") int idEmpresa, @PathParam("idEmpleado") int idEmpleado)
+    {
+        try 
+        {
+            if (service.eliminarEmpleado(idEmpresa, idEmpleado))
+            {
+                return Response.ok("Exito: Empleado eliminado correctamente.").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo eliminar.").build();
+        }
+        catch (Exception e)
+        {
+            if (e.getMessage().contains("último empleado")) 
+            {
+                return Response.status(Response.Status.CONFLICT).entity("Error: " + e.getMessage()).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
         }
     }
 }
