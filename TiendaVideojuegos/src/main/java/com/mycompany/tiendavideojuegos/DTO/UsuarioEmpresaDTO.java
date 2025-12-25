@@ -36,7 +36,7 @@ public class UsuarioEmpresaDTO extends UsuarioDTO
     
     public void setFechaNacimiento(Date fechaNacimiento)
     {
-        this.fechaNacimientoEmpleado = fechaNacimientoEmpleado;
+        this.fechaNacimientoEmpleado = fechaNacimiento;
     }
     
     public String getNombreEmpresaAux()

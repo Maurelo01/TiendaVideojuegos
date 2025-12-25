@@ -26,7 +26,13 @@ public class UsuariosService
         {
             throw new Exception("El correo y la contraseña son obligatorios.");
         }
-        return usuarioModel.login(correo, contraseña);
+        UsuarioDTO usuarioEncontrado = usuarioModel.login(correo, contraseña);
+        if (usuarioEncontrado != null && "EMPRESA".equals(usuarioEncontrado.getRol())) 
+        {
+            int idEmpresa = usuarioModel.obtenerIdEmpresaPorUsuario(usuarioEncontrado.getIdUsuario());
+            usuarioEncontrado.setIdEmpresa(idEmpresa);
+        }
+        return usuarioEncontrado;
     }
     
     public UsuarioComunGamerDTO registrarGamer(UsuarioComunGamerDTO gamer) throws Exception

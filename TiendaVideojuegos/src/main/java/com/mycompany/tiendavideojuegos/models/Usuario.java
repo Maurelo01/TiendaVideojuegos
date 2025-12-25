@@ -116,4 +116,29 @@ public class Usuario
         }
         return empresa;
     }
+    
+    public int obtenerIdEmpresaPorUsuario(int idUsuario) 
+    {
+        int idEmpresa = -1;
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try 
+        {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id_empresa FROM Usuario_Empresa WHERE id_usuario = ?"))
+            {
+                ps.setInt(1, idUsuario);
+                try (ResultSet rs = ps.executeQuery()) 
+                {
+                    if (rs.next()) 
+                    {
+                        idEmpresa = rs.getInt("id_empresa");
+                    }
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error obteniendo id empresa: " + e.getMessage());
+        }
+        return idEmpresa;
+    }
 }
