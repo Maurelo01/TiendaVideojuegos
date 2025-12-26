@@ -259,4 +259,23 @@ public class Videojuegos
         }
         return exito;
     }
+    
+    public boolean actualizarEstado(int idJuego, String nuevoEstado) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try 
+        {
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE Videojuego SET estado = ? WHERE id_juego = ?")) 
+            {
+                ps.setString(1, nuevoEstado);
+                ps.setInt(2, idJuego);
+                return ps.executeUpdate() > 0;
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error actualizando estado del juego: " + e.getMessage());
+            return false;
+        }
+    }
 }
