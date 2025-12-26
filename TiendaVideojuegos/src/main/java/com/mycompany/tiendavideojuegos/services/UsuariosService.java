@@ -183,4 +183,39 @@ public class UsuariosService
         }
         return empresaModel.eliminarUsuario(idUsuarioEmpleado);
     }
+    
+    public UsuarioComunGamerDTO obtenerPerfilGamer(int idUsuario) throws Exception
+    {
+        if (idUsuario <= 0) throw new Exception("Id inválido");
+        UsuarioComunGamerDTO gamer = gamerModel.obtenerPorId(idUsuario);
+        if (gamer == null) throw new Exception("Usuario no encontrado");
+        gamer.setContraseña(null); 
+        return gamer;
+    }
+    
+    public boolean actualizarPerfilGamer(int idUsuario, UsuarioComunGamerDTO datosNuevos) throws Exception
+    {
+        if (idUsuario <= 0) throw new Exception("Id inválido");
+        if (datosNuevos.getNickname() == null || datosNuevos.getNickname().trim().isEmpty()) 
+        {
+            throw new Exception("El nickname es obligatorio");
+        }
+        if (datosNuevos.getContraseña() != null && !datosNuevos.getContraseña().isEmpty()) 
+        {
+            if (datosNuevos.getContraseña().length() < 8)
+            {
+                throw new Exception("La nueva contraseña debe tener al menos 8 caracteres");
+            }
+        }
+        datosNuevos.setIdUsuario(idUsuario);
+        return gamerModel.actualizarPerfil(datosNuevos);
+    }
+    
+    public EmpresaDTO obtenerPerfilPublicoEmpresa(int idEmpresa) throws Exception
+    {
+        if (idEmpresa <= 0) throw new Exception("Id de empresa inválido");
+        EmpresaDTO empresa = empresaModel.obtenerDatosPublicosEmpresa(idEmpresa);
+        if (empresa == null) throw new Exception("Empresa no encontrada");
+        return empresa;
+    }
 }

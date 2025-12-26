@@ -11,6 +11,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -146,6 +147,56 @@ public class UsuariosResource
                 return Response.status(Response.Status.CONFLICT).entity("Error: " + e.getMessage()).build();
             }
             return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("gamer/{id}") // /api/usuarios/gamer/{id}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verPerfilGamer(@PathParam("id") int id) 
+    {
+        try 
+        {
+            return Response.ok(service.obtenerPerfilGamer(id)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: " + e.getMessage()).build();
+        }
+    }
+
+    @PUT
+    @Path("gamer/{id}") // /api/usuarios/gamer/{id}
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editarPerfilGamer(@PathParam("id") int id, UsuarioComunGamerDTO gamer) 
+    {
+        try 
+        {
+            if (service.actualizarPerfilGamer(id, gamer)) 
+            {
+                return Response.ok("Exito: Perfil actualizado correctamente").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo actualizar").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("empresa/publica/{id}") // /api/usuarios/empresa/publica/{id}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verPerfilEmpresa(@PathParam("id") int id) 
+    {
+        try 
+        {
+            return Response.ok(service.obtenerPerfilPublicoEmpresa(id)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: " + e.getMessage()).build();
         }
     }
 }
