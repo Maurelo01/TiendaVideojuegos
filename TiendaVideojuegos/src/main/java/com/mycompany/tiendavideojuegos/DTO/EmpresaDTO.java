@@ -6,6 +6,7 @@ public class EmpresaDTO
     private String descripcion;
     private float porcentajeComisionEspecifica;
     private String imagenBanner;
+    private String estado;
     
     public int getIdEmpresa() 
     { 
@@ -55,5 +56,15 @@ public class EmpresaDTO
     public void setImagenBanner(String imagenBanner)
     {
         this.imagenBanner = imagenBanner;
+    }
+    
+    public String getEstado()
+    {
+        return estado;
+    }
+    
+    public void setEstado(String estado)
+    {
+        this.estado = estado;
     }
 }

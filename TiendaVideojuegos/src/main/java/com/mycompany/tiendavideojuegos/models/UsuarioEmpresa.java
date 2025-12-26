@@ -272,4 +272,95 @@ public class UsuarioEmpresa
         }
         return empresa;
     }
+    
+    public java.util.List<EmpresaDTO> listarTodas() 
+    {
+        java.util.List<EmpresaDTO> lista = new java.util.ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Empresa"); ResultSet rs = ps.executeQuery()) 
+        {
+            while (rs.next()) 
+            {
+                EmpresaDTO emp = new EmpresaDTO();
+                emp.setIdEmpresa(rs.getInt("id_empresa"));
+                emp.setNombreEmpresa(rs.getString("nombre_empresa"));
+                emp.setDescripcion(rs.getString("descripcion"));
+                emp.setPorcentajeComisionEspecifica(rs.getFloat("porcentaje_comision_especifica"));
+                emp.setEstado(rs.getString("estado"));
+                byte[] imgBytes = rs.getBytes("imagen_banner");
+                if (imgBytes != null && imgBytes.length > 0) 
+                {
+                    emp.setImagenBanner(java.util.Base64.getEncoder().encodeToString(imgBytes));
+                }
+                lista.add(emp);
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error listando empresas: " + e.getMessage());
+        }
+        return lista;
+    }
+    
+    public boolean actualizarEmpresa(EmpresaDTO empresa) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        boolean actualizarImagen = (empresa.getImagenBanner() != null && !empresa.getImagenBanner().isEmpty());
+        String conSinImagen;
+        if (actualizarImagen) 
+        {
+            conSinImagen = "UPDATE Empresa SET nombre_empresa = ?, descripcion = ?, porcentaje_comision_especifica = ?, imagen_banner = ? WHERE id_empresa = ?";
+        }
+        else
+        {
+            conSinImagen = "UPDATE Empresa SET nombre_empresa = ?, descripcion = ?, porcentaje_comision_especifica = ? WHERE id_empresa = ?";
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(conSinImagen)) 
+        {
+            ps.setString(1, empresa.getNombreEmpresa());
+            ps.setString(2, empresa.getDescripcion());
+            if (empresa.getPorcentajeComisionEspecifica() > 0) 
+            {
+                ps.setFloat(3, empresa.getPorcentajeComisionEspecifica());
+            }
+            else
+            {
+                ps.setNull(3, java.sql.Types.DECIMAL);
+            }
+            if (actualizarImagen)
+            {
+                byte[] imgBytes = java.util.Base64.getDecoder().decode(empresa.getImagenBanner());
+                ps.setBytes(4, imgBytes);
+                ps.setInt(5, empresa.getIdEmpresa());
+            }
+            else
+            {
+                ps.setInt(4, empresa.getIdEmpresa());
+            }
+
+            return ps.executeUpdate() > 0;
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error actualizando empresa: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean cambiarEstado(int idEmpresa, String nuevoEstado) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Empresa SET estado = ? WHERE id_empresa = ?")) 
+        {
+            ps.setString(1, nuevoEstado);
+            ps.setInt(2, idEmpresa);
+            return ps.executeUpdate() > 0;
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error cambiando estado empresa: " + e.getMessage());
+            return false;
+        }
+    }
 }
