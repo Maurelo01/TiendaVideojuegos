@@ -97,4 +97,22 @@ public class VideojuegosService
         }   
         return modelo.listarActivos();
     }
+    
+    public boolean suspenderJuego(int idJuego) throws Exception
+    {
+        if (idJuego <= 0) 
+        {
+            throw new Exception("Id de juego inválido.");
+        }
+        return modelo.actualizarEstado(idJuego, "SUSPENDIDO");
+    }
+    
+    public boolean activarJuego(int idJuego) throws Exception
+    {
+        if (idJuego <= 0) 
+        {
+            throw new Exception("Id de juego inválido.");
+        }
+        return modelo.actualizarEstado(idJuego, "ACTIVO");
+    }
 }

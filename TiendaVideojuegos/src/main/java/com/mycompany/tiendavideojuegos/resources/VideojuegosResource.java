@@ -87,4 +87,42 @@ public class VideojuegosResource
             return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
         }
     }
+    
+    @PUT
+    @Path("{id}/suspender") // /api/videojuegos/{id}/suspender
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response suspenderJuego(@PathParam("id") int id) 
+    {
+        try 
+        {
+            if (service.suspenderJuego(id)) 
+            {
+                return Response.ok("Exito: La venta del juego ha sido suspendida y ya no aparecrá en el catálogo.").build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: No se encontró el juego o no se pudo realizar la acción.").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @PUT
+    @Path("{id}/activar") // /api/videojuegos/{id}/activar
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response activarJuego(@PathParam("id") int id) 
+    {
+        try 
+        {
+            if (service.activarJuego(id)) 
+            {
+                return Response.ok("Exito: El juego ha sido reactivado y está disponible en la tienda.").build();
+            }
+            return Response.status(Response.Status.NOT_FOUND).entity("Error: No se encontró el juego o no se pudo activar.").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
 }
