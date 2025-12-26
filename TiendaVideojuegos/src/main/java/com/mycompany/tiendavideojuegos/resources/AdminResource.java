@@ -3,6 +3,7 @@ package com.mycompany.tiendavideojuegos.resources;
 import com.mycompany.tiendavideojuegos.DTO.BannerDTO;
 import com.mycompany.tiendavideojuegos.DTO.CategoriaDTO;
 import com.mycompany.tiendavideojuegos.DTO.ConfiguracionDTO;
+import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
 import com.mycompany.tiendavideojuegos.services.AdminService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -89,7 +90,7 @@ public class AdminResource
     }
     
     @PUT
-    @Path("categorias/{id}")
+    @Path("categorias/{id}") // /api/admin/categorias/{id}
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response editarCategoria(@PathParam("id") int id, @QueryParam("confirmar") boolean confirmar, CategoriaDTO cat) 
@@ -114,7 +115,7 @@ public class AdminResource
     }
     
     @DELETE
-    @Path("categorias/{id}")
+    @Path("categorias/{id}") // /api/admin/categorias/{id}
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminarCategoria(@PathParam("id") int id, @QueryParam("confirmar") boolean confirmar)
     {
@@ -133,6 +134,70 @@ public class AdminResource
                 return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
             }
             return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("empresas") // /api/admin/empresas
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listarEmpresas() 
+    {
+        return Response.ok(service.listarEmpresas()).build();
+    }
+    
+    @PUT
+    @Path("empresas/{id}") // /api/admin/empresas/{id}
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editarEmpresa(@PathParam("id") int id, EmpresaDTO empresa) 
+    {
+        try 
+        {
+            empresa.setIdEmpresa(id);
+            if (service.editarEmpresa(empresa)) 
+            {
+                return Response.ok("Exito: Empresa actualizada").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo actualizar").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @PUT
+    @Path("empresas/{id}/suspender") // /api/admin/empresas/{id}/suspender
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response suspenderEmpresa(@PathParam("id") int id) 
+    {
+        try 
+        {
+            if(service.suspenderEmpresa(id)) return Response.ok("Exito: Empresa suspendida").build();
+            return Response.serverError().build();
+        }
+        catch(Exception e)
+        {
+            return Response.status(400).entity(e.getMessage()).build();
+        }
+    }
+    
+    @PUT
+    @Path("empresas/{id}/activar") ///api/admin/empresas/{id}/activar 
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response activarEmpresa(@PathParam("id") int id)
+    {
+        try 
+        {
+            if (service.activarEmpresa(id))
+            {
+                return Response.ok("Exito: Empresa activada").build();
+            }
+            return Response.serverError().build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(400).entity(e.getMessage()).build();
         }
     }
 }
