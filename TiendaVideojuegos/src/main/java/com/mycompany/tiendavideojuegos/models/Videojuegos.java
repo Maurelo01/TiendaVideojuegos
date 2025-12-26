@@ -205,6 +205,16 @@ public class Videojuegos
             }
             if(filas > 0)
             {
+                if (juego.getImagen() != null && !juego.getImagen().isEmpty()) 
+                {
+                    try (PreparedStatement psImg = conn.prepareStatement("UPDATE Videojuego SET imagen_portada = ? WHERE id_juego = ?")) 
+                    {
+                        byte[] imagenBytes = java.util.Base64.getDecoder().decode(juego.getImagen());
+                        psImg.setBytes(1, imagenBytes);
+                        psImg.setInt(2, juego.getIdJuego());
+                        psImg.executeUpdate();
+                    }
+                }
                 if (juego.getIdsCategorias() != null) 
                 {
                     // Actualizar categorias
