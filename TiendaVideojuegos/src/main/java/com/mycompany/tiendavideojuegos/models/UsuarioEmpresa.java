@@ -27,7 +27,15 @@ public class UsuarioEmpresa
             {   
                 psEmpresa.setString(1, empresa.getNombreEmpresa());
                 psEmpresa.setString(2, empresa.getDescripcion());
-                psEmpresa.setString(3, empresa.getImagenBanner());
+                if (empresa.getImagenBanner() != null && !empresa.getImagenBanner().isEmpty()) 
+                {
+                    byte[] imagenBytes = java.util.Base64.getDecoder().decode(empresa.getImagenBanner());
+                    psEmpresa.setBytes(3, imagenBytes);
+                }
+                else
+                {
+                    psEmpresa.setNull(3, java.sql.Types.BLOB);
+                }
                 psEmpresa.executeUpdate();
                 try (ResultSet rsEmpresa = psEmpresa.getGeneratedKeys()) 
                 {
@@ -214,7 +222,6 @@ public class UsuarioEmpresa
     }
     
     public boolean eliminarUsuario(int idUsuario) 
-
     {
         Connection conn = ConexionDB.getInstance().getConnection();
         try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Usuario WHERE id_usuario = ?")) 
@@ -229,5 +236,40 @@ public class UsuarioEmpresa
             return false;
         }
 
+    }
+    
+    public EmpresaDTO obtenerDatosPublicosEmpresa(int idEmpresa) 
+    {
+        EmpresaDTO empresa = null;
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Empresa WHERE id_empresa = ?")) 
+        {
+            ps.setInt(1, idEmpresa);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    empresa = new EmpresaDTO();
+                    empresa.setIdEmpresa(rs.getInt("id_empresa"));
+                    empresa.setNombreEmpresa(rs.getString("nombre_empresa"));
+                    empresa.setDescripcion(rs.getString("descripcion"));
+                    byte[] imgBytes = rs.getBytes("imagen_banner");
+                    if (imgBytes != null && imgBytes.length > 0)
+                    {
+                        String base64 = java.util.Base64.getEncoder().encodeToString(imgBytes);
+                        empresa.setImagenBanner(base64);
+                    }
+                    else
+                    {
+                        empresa.setImagenBanner(null);
+                    }
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error obteniendo empresa: " + e.getMessage());
+        }
+        return empresa;
     }
 }
