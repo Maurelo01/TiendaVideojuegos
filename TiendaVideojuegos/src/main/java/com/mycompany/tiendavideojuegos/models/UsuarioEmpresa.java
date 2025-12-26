@@ -363,4 +363,26 @@ public class UsuarioEmpresa
             return false;
         }
     }
+    
+    public boolean esEmpresaSuspendida(int idUsuario) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT e.estado FROM Empresa e JOIN Usuario_Empresa ue ON e.id_empresa = ue.id_empresa WHERE ue.id_usuario = ?")) 
+        {
+            ps.setInt(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    String estado = rs.getString("estado");
+                    return "SUSPENDIDO".equals(estado);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error verificando estado empresa: " + e.getMessage());
+        }
+        return false;
+    }
 }
