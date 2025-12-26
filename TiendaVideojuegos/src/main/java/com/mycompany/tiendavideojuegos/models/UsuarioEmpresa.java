@@ -93,7 +93,7 @@ public class UsuarioEmpresa
         return exito;
     }
     
-    public boolean agregarEmpleado(int idEmpresaExistente, UsuarioEmpresaDTO nuevoUsuario) 
+    public boolean agregarEmpleado(int idEmpresaExistente, UsuarioEmpresaDTO nuevoUsuario) throws Exception
     {
         Connection conn = ConexionDB.getInstance().getConnection();
         int idUsuarioGenerado = -1;
@@ -134,9 +134,13 @@ public class UsuarioEmpresa
                 }
             }
         } 
-        catch (Exception e) 
+        catch (SQLException e) 
         {
             System.err.println("Error en la agregar empleado: " + e.getMessage());
+            if (e.getMessage().contains("Duplicate entry")) 
+            {
+                throw new Exception("El correo electrónico ya está registrado en el sistema.");
+            }
             if (idUsuarioGenerado != -1) 
             {
                 try 

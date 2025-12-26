@@ -135,7 +135,7 @@ public class UsuariosService
         
         if (usuario.getContraseña() == null || usuario.getContraseña().length() < 8)
         {
-            throw new Exception("La contraseña debe tener al menos 5 caracteres.");
+            throw new Exception("La contraseña debe tener al menos 8 caracteres.");
         }
         
         if (usuario.getNombreEmpleado() == null || usuario.getNombreEmpleado().trim().isEmpty())
@@ -147,7 +147,11 @@ public class UsuariosService
         {
             throw new Exception("La fecha de nacimiento es obligatoria.");
         }
-
+        
+        if (!esFechaValida(usuario.getFechaNacimiento())) 
+        {
+            throw new Exception("La fecha de nacimiento no es válida ya que no puede ser futura.");
+        }
         return empresaModel.agregarEmpleado(idEmpresa, usuario);
     }
 
