@@ -30,6 +30,10 @@ public class UsuariosService
         UsuarioDTO usuarioEncontrado = usuarioModel.login(correo, contraseña);
         if (usuarioEncontrado != null && "EMPRESA".equals(usuarioEncontrado.getRol())) 
         {
+            if (empresaModel.esEmpresaSuspendida(usuarioEncontrado.getIdUsuario())) 
+            {
+                throw new Exception("Acceso denegado: Tu empresa ha sido suspendida por la administración.");
+            }
             int idEmpresa = usuarioModel.obtenerIdEmpresaPorUsuario(usuarioEncontrado.getIdUsuario());
             usuarioEncontrado.setIdEmpresa(idEmpresa);
         }

@@ -152,7 +152,7 @@ public class Videojuegos
     {
         List<VideojuegosDTO> lista = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Videojuego WHERE estado = 'ACTIVO'"); ResultSet rs = ps.executeQuery()) 
+        try (PreparedStatement ps = conn.prepareStatement("SELECT v.* FROM Videojuego v JOIN Empresa e ON v.id_empresa = e.id_empresa WHERE v.estado = 'ACTIVO' AND e.estado = 'ACTIVO'"); ResultSet rs = ps.executeQuery()) 
         {
             while (rs.next()) 
             {
