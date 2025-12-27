@@ -71,7 +71,7 @@ public class AdminResource
         return Response.serverError().build();
     }
 
-    @GET // /api/admin/banner/{id}
+    @GET // /api/admin/banner
     @Path("banner")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBanner() 
@@ -85,8 +85,32 @@ public class AdminResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response añadirBanner(BannerDTO banner) 
     {
-        if(service.agregarBanner(banner)) return Response.ok().build();
-        return Response.serverError().build();
+        try 
+        {
+            if(service.agregarBanner(banner)) return Response.ok("Exito: Banner creado").build();
+            return Response.serverError().build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+        }
+    }
+    
+    @PUT
+    @Path("banner") // /api/admin/banner
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editarBanner(BannerDTO banner) 
+    {
+        try
+        {
+            if(service.editarBanner(banner)) return Response.ok("Exito: Banner actualizado").build();
+            return Response.serverError().build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+        }
     }
     
     @PUT
@@ -111,6 +135,25 @@ public class AdminResource
                 return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
             }
             return Response.status(Response.Status.BAD_REQUEST).entity("Error de validación: " + e.getMessage()).build();
+        }
+    }
+    
+    @DELETE
+    @Path("banner/{id}") // /api/admin/banner/{id}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response eliminarBanner(@PathParam("id") int id) 
+    {
+        try 
+        {
+            if(service.eliminarBanner(id)) 
+            {
+                return Response.ok("Exito: Banner eliminado correctamente").build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: No se pudo eliminar el banner.").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
         }
     }
     

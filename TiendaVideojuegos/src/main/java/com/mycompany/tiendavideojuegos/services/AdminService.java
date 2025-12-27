@@ -47,9 +47,29 @@ public class AdminService
         return modeloBanner.listarBannersActivos();
     }
     
-    public boolean agregarBanner(BannerDTO banner) 
+    public boolean agregarBanner(BannerDTO banner) throws Exception 
     {
+        if (modeloBanner.existeLugar(banner.getLugar(), -1)) 
+        {
+            throw new Exception("El lugar " + banner.getLugar() + " ya está ocupado por otro banner.");
+        }
         return modeloBanner.agregar(banner);
+    }
+    
+    public boolean editarBanner(BannerDTO banner) throws Exception
+    {
+        if (banner.getIdBanner() <= 0) throw new Exception("Id inválido");
+        if (modeloBanner.existeLugar(banner.getLugar(), banner.getIdBanner())) 
+        {
+            throw new Exception("El lugar " + banner.getLugar() + " ya está ocupado por otro banner.");
+        }
+        return modeloBanner.actualizar(banner);
+    }
+    
+    public boolean eliminarBanner(int id) throws Exception
+    {
+        if (id <= 0) throw new Exception("Id inválido");
+        return modeloBanner.eliminar(id);
     }
     
     public boolean editarCategoria(CategoriaDTO cat, boolean forzarEdicion) throws Exception
