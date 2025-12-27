@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Base64;
 
 public class UsuarioComunGamer
 {
@@ -73,7 +74,7 @@ public class UsuarioComunGamer
     {
         UsuarioComunGamerDTO gamer = null;
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT u.id_usuario, u.correo, u.rol, u.fecha_registro, g.nickname, g.fecha_nacimiento, g.telefono, g.pais, g.saldo_cartera FROM Usuario u " + 
+        try (PreparedStatement ps = conn.prepareStatement("SELECT u.id_usuario, u.correo, u.rol, u.fecha_registro, g.nickname, g.fecha_nacimiento, g.telefono, g.pais, g.saldo_cartera, g.avatar FROM Usuario u " + 
                 "JOIN Usuario_Comun_Gamer g ON u.id_usuario = g.id_usuario WHERE u.id_usuario = ?")) 
         {
             ps.setInt(1, idUsuario);
@@ -91,6 +92,12 @@ public class UsuarioComunGamer
                     gamer.setTelefono(rs.getString("telefono"));
                     gamer.setPais(rs.getString("pais"));
                     gamer.setSaldoCartera(rs.getFloat("saldo_cartera"));
+                    byte[] imgBytes = rs.getBytes("avatar");
+                    if (imgBytes != null && imgBytes.length > 0) 
+                    {
+                        String base64 = Base64.getEncoder().encodeToString(imgBytes);
+                        gamer.setAvatar(base64);
+                    }
                 }
             }
         } 
@@ -114,6 +121,16 @@ public class UsuarioComunGamer
                 psGamer.setString(3, gamer.getPais());
                 psGamer.setInt(4, gamer.getIdUsuario());
                 psGamer.executeUpdate();
+            }
+            if (gamer.getAvatar() != null && !gamer.getAvatar().isEmpty()) 
+            {
+                try (PreparedStatement psAvatar = conn.prepareStatement("UPDATE Usuario_Comun_Gamer SET avatar = ? WHERE id_usuario = ?")) 
+                {
+                    byte[] imagenBytes = Base64.getDecoder().decode(gamer.getAvatar());
+                    psAvatar.setBytes(1, imagenBytes); 
+                    psAvatar.setInt(2, gamer.getIdUsuario());
+                    psAvatar.executeUpdate();
+                }
             }
             if (gamer.getContraseña() != null && !gamer.getContraseña().isEmpty()) 
             {

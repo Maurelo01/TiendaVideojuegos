@@ -9,6 +9,7 @@ public class UsuarioComunGamerDTO extends UsuarioDTO
     private String telefono;
     private String pais;
     private float saldoCartera;
+    private String avatar;
     
     public String getNickname() 
     {
@@ -58,5 +59,15 @@ public class UsuarioComunGamerDTO extends UsuarioDTO
     public void setPais(String pais) 
     {
         this.pais = pais;
+    }
+    
+    public String getAvatar() 
+    {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) 
+    {
+        this.avatar = avatar;
     }
 }
