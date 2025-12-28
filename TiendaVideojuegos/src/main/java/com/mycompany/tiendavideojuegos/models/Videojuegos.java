@@ -126,6 +126,7 @@ public class Videojuegos
                         videojuego.setEstado(rs.getString("estado"));
                         videojuego.setFechaPublicacion(rs.getDate("fecha_publicacion"));
                         videojuego.setComentariosEstado(rs.getBoolean("comentarios_estado"));
+                        videojuego.setIdsCategorias(obtenerCategoriasJuego(conn, videojuego.getIdJuego()));
                         lista.add(videojuego);
                     }
                 }
@@ -208,13 +209,13 @@ public class Videojuegos
                 if (juego.getIdsCategorias() != null) 
                 {
                     // Actualizar categorias
-                    try (PreparedStatement psDelCat = conn.prepareStatement("DELETE FROM Juego_Categoria WHERE id_juego = ?")) 
+                    try (PreparedStatement psDel = conn.prepareStatement("DELETE FROM Juego_Categoria WHERE id_juego = ?"))
                     {
-                        psDelCat.setInt(1, juego.getIdJuego());
-                        psDelCat.executeUpdate();
+                        psDel.setInt(1, juego.getIdJuego());
+                        psDel.executeUpdate();
                     }
                     // Insertar nuevas categorias 
-                    if (!juego.getIdsCategorias().isEmpty()) 
+                    if (juego.getIdsCategorias() != null && !juego.getIdsCategorias().isEmpty()) 
                     {
                         try (PreparedStatement psInsCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)")) 
                         {
@@ -416,5 +417,26 @@ public class Videojuegos
             System.err.println("Error en búsqueda: " + e.getMessage());
         }
         return lista;
+    }
+    
+    private List<Integer> obtenerCategoriasJuego(Connection conn, int idJuego)
+    {
+        List<Integer> ids = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT id_categoria FROM Juego_Categoria WHERE id_juego = ?"))
+        {
+            ps.setInt(1, idJuego);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while(rs.next())
+                {
+                    ids.add(rs.getInt("id_categoria"));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return ids;
     }
 }
