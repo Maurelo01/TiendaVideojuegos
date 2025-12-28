@@ -3,7 +3,7 @@ public class MultimediaDTO
 {
     private int idMedia;
     private int idJuego;
-    private String url;
+    private String contenido;
     private String tipo;
     
     public int getIdMedia() 
@@ -26,16 +26,6 @@ public class MultimediaDTO
         this.idJuego = idJuego;
     }
     
-    public String getUrl() 
-    {
-        return url;
-    }
-    
-    public void setUrl(String url) 
-    {
-        this.url = url;
-    }
-    
     public String getTipo() 
     {
         return tipo;
@@ -44,5 +34,15 @@ public class MultimediaDTO
     public void setTipo(String tipo) 
     {
         this.tipo = tipo;
+    }
+    
+    public String getContenido()
+    {
+        return contenido;
+    }
+    
+    public void setContenido(String contenido)
+    {
+        this.contenido = contenido;
     }
 }

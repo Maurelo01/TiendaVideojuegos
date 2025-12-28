@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.services;
 
+import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.models.Videojuegos;
 import java.util.ArrayList;
@@ -114,5 +115,30 @@ public class VideojuegosService
             throw new Exception("Id de juego inválido.");
         }
         return modelo.actualizarEstado(idJuego, "ACTIVO");
+    }
+    
+    public boolean agregarMultimedia(int idJuego, List<MultimediaDTO> multimediaList) throws Exception
+    {
+        if (idJuego <= 0) throw new Exception("Id de juego inválido.");
+        if (multimediaList == null || multimediaList.isEmpty()) throw new Exception("La lista de multimedia está vacía.");
+        return modelo.agregarMultimedia(idJuego, multimediaList);
+    }
+    
+    public List<MultimediaDTO> listarMultimedia(int idJuego) throws Exception
+    {
+        if (idJuego <= 0)
+        {
+            throw new Exception("Id de juego inválido");
+        }
+        return modelo.obtenerMultimedia(idJuego);
+    }
+    
+    public boolean eliminarMultimedia(int idMedia) throws Exception 
+    {
+        if (idMedia <= 0) 
+        {
+            throw new Exception("El Id del multimedia no es válido.");
+        }
+        return modelo.eliminarMultimedia(idMedia);
     }
 }
