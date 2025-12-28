@@ -227,4 +227,36 @@ public class UsuarioComunGamer
         }
         return lista;
     }
+    
+    public boolean instalarJuegoEnBiblioteca(int idGamer, int idJuego)
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Biblioteca_Personal SET estado_instalacion = 'INSTALADO' WHERE id_gamer = ? AND id_juego = ?"))
+        {
+            ps.setInt(1, idGamer);
+            ps.setInt(2, idJuego);
+            return ps.executeUpdate() > 0;
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean desinstalarJuegoEnBiblioteca(int idGamer, int idJuego)
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Biblioteca_Personal SET estado_instalacion = 'NO_INSTALADO' WHERE id_gamer = ? AND id_juego = ?"))
+        {
+            ps.setInt(1, idGamer);
+            ps.setInt(2, idJuego);
+            return ps.executeUpdate() > 0;
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
