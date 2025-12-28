@@ -5,6 +5,7 @@ import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Base64;
 
@@ -149,5 +150,43 @@ public class UsuarioComunGamer
             exito = false;
         } 
         return exito;
+    }
+    
+    public boolean sumarSaldo(int idUsuario, double monto) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Usuario_Comun_Gamer SET saldo_cartera = saldo_cartera + ? WHERE id_usuario = ?")) 
+        {
+            ps.setDouble(1, monto);
+            ps.setInt(2, idUsuario);
+            
+            return ps.executeUpdate() > 0;
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error recargando saldo: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public double obtenerSaldo(int idUsuario) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT saldo_cartera FROM Usuario_Comun_Gamer WHERE id_usuario = ?")) 
+        {
+            ps.setInt(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                if (rs.next()) 
+                {
+                    return rs.getDouble("saldo_cartera");
+                }
+            }
+        } 
+        catch (SQLException e) 
+        {
+            e.printStackTrace();
+        }
+        return 0.0;
     }
 }

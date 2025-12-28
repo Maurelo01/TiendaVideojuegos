@@ -222,4 +222,24 @@ public class UsuariosService
         if (empresa == null) throw new Exception("Empresa no encontrada");
         return empresa;
     }
+    
+    public double recargarSaldo(int idUsuario, float monto) throws Exception
+    {
+        if (idUsuario <= 0) 
+        {
+            throw new Exception("Id de usuario inválido.");
+        }
+        if (monto <= 0) 
+        {
+            throw new Exception("El monto a recargar debe ser mayor a 0.");
+        }
+        if (gamerModel.sumarSaldo(idUsuario, monto)) 
+        {
+            return gamerModel.obtenerSaldo(idUsuario);
+        }
+        else
+        {
+            throw new Exception("No se pudo realizar la recarga. Verifica que el usuario exista.");
+        }
+    }
 }
