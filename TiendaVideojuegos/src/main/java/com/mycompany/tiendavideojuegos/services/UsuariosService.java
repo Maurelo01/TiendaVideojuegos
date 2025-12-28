@@ -223,19 +223,29 @@ public class UsuariosService
         return empresa;
     }
     
-    public double recargarSaldo(int idUsuario, float monto) throws Exception
+    public float recargarSaldo(int idUsuario, float monto) throws Exception
     {
         if (idUsuario <= 0) 
         {
-            throw new Exception("Id de usuario inválido.");
+            throw new IllegalArgumentException("Id de usuario inválido.");
         }
         if (monto <= 0) 
         {
-            throw new Exception("El monto a recargar debe ser mayor a 0.");
+            throw new IllegalArgumentException("El monto a recargar debe ser mayor a 0.");
         }
-        if (gamerModel.sumarSaldo(idUsuario, monto)) 
+        if (monto > 10000) 
         {
-            return gamerModel.obtenerSaldo(idUsuario);
+            throw new IllegalArgumentException("El monto máximo de recarga es de $10,000, no cabe tanto pisto.");
+        }
+        boolean exitoso = gamerModel.sumarSaldo(idUsuario, monto);
+        if (exitoso) 
+        {
+            float nuevoSaldo = gamerModel.obtenerSaldo(idUsuario);
+            if (nuevoSaldo == 0.0f) 
+            {
+                throw new Exception("Error al obtener el saldo actualizado.");
+            }
+            return nuevoSaldo;
         }
         else
         {

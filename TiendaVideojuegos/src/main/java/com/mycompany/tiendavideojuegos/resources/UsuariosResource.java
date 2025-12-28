@@ -1,6 +1,8 @@
 package com.mycompany.tiendavideojuegos.resources;
 
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
+import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
+import com.mycompany.tiendavideojuegos.DTO.RespuestaRecarga;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudLogin;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudRegistroEmpresa;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudSaldo;
@@ -202,19 +204,31 @@ public class UsuariosResource
     }
     
     @POST
-    @Path("gamer/{id}/recargar") // /api/usuarios/gamer/{id}/recargar
+    @Path("gamer/{id}/recargar") // /api/usuarios/empresa/publica/{id}
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response recargarCartera(@PathParam("id") int idUsuario, SolicitudSaldo solicitud) 
     {
         try 
         {
-            double nuevoSaldo = service.recargarSaldo(idUsuario, solicitud.getMonto());
-            return Response.ok("{\"mensaje\": \"Recarga exitosa\", \"nuevoSaldo\": " + nuevoSaldo + "}").build();
+            if (solicitud == null) 
+            {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Error: La solicitud no puede estar vacía")).build();
+            }
+
+            float nuevoSaldo = service.recargarSaldo(idUsuario, solicitud.getMonto());
+            RespuestaRecarga respuesta = new RespuestaRecarga("Recarga exitosa", nuevoSaldo);
+            return Response.ok(respuesta).build();
         } 
+        catch (IllegalArgumentException e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Error: " + e.getMessage())).build();
+        }
         catch (Exception e) 
         {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+            System.err.println("Error en recargarCartera: " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError("Error interno del servidor")).build();
         }
     }
 }

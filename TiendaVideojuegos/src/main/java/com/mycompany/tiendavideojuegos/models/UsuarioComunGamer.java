@@ -152,24 +152,26 @@ public class UsuarioComunGamer
         return exito;
     }
     
-    public boolean sumarSaldo(int idUsuario, double monto) 
+    public boolean sumarSaldo(int idUsuario, float monto) 
     {
         Connection conn = ConexionDB.getInstance().getConnection();
         try (PreparedStatement ps = conn.prepareStatement("UPDATE Usuario_Comun_Gamer SET saldo_cartera = saldo_cartera + ? WHERE id_usuario = ?")) 
         {
-            ps.setDouble(1, monto);
+            ps.setFloat(1, monto);
             ps.setInt(2, idUsuario);
-            
-            return ps.executeUpdate() > 0;
+
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
         } 
         catch (SQLException e) 
         {
             System.err.println("Error recargando saldo: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
     
-    public double obtenerSaldo(int idUsuario) 
+    public float obtenerSaldo(int idUsuario) 
     {
         Connection conn = ConexionDB.getInstance().getConnection();
         try (PreparedStatement ps = conn.prepareStatement("SELECT saldo_cartera FROM Usuario_Comun_Gamer WHERE id_usuario = ?")) 
@@ -179,14 +181,15 @@ public class UsuarioComunGamer
             {
                 if (rs.next()) 
                 {
-                    return rs.getDouble("saldo_cartera");
+                    return rs.getFloat("saldo_cartera");
                 }
             }
         } 
         catch (SQLException e) 
         {
+            System.err.println("Error obteniendo saldo: " + e.getMessage());
             e.printStackTrace();
         }
-        return 0.0;
+        return 0.0f;
     }
 }

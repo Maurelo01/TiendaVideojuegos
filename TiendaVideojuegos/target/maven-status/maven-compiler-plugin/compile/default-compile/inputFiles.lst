@@ -7,7 +7,9 @@
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/models/UsuarioComunGamer.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/JakartaRestConfiguration.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/MultimediaDTO.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/RespuestaRecarga.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/SolicitudSaldo.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/RespuestaError.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/models/Configuracion.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/services/UsuariosService.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/UsuarioEmpresaDTO.java
