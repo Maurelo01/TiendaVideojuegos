@@ -1,6 +1,7 @@
 package com.mycompany.tiendavideojuegos.resources;
 
 import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
+import com.mycompany.tiendavideojuegos.DTO.RespuestaExito;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaRecarga;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudLogin;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudRegistroEmpresa;
@@ -243,6 +244,43 @@ public class UsuariosResource
         catch (Exception e)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Error al cargar biblioteca: " + e.getMessage())).build();
+        }
+    }
+    
+    @PUT
+    @Path("gamer/{id}/biblioteca/{idJuego}/instalar") // api/usuarios/gamer/{id}/biblioteca/{id}/instalar
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response instalarJuego(@PathParam("id") int idUsuario, @PathParam("idJuego") int idJuego)
+    {
+        try
+        {
+            if (service.instalarJuego(idUsuario, idJuego))
+            {
+                return Response.ok(new RespuestaExito("Juego instalado correctamente")).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("No se pudo instalar.")).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
+    
+    @PUT
+    @Path("gamer/{id}/biblioteca/{idJuego}/desinstalar") // api/usuarios/gamer/{id}/biblioteca/{id}/desinstalar
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response desinstalarJuego(@PathParam("id") int idUsuario, @PathParam("idJuego") int idJuego) {
+        try
+        {
+            if (service.desinstalarJuego(idUsuario, idJuego))
+            {
+                return Response.ok(new RespuestaExito("Juego desinstalado correctamente")).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("No se pudo desinstalar.")).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError(e.getMessage())).build();
         }
     }
 }

@@ -262,4 +262,16 @@ public class UsuariosService
         }
         return gamerModel.obtenerBiblioteca(idGamer);
     }
+    
+    public boolean instalarJuego(int idGamer, int idJuego) throws Exception 
+    {
+        if (idGamer <= 0 || idJuego <= 0) throw new Exception("Ids inválidos");
+        return gamerModel.instalarJuegoEnBiblioteca(idGamer, idJuego);
+    }
+    
+    public boolean desinstalarJuego(int idGamer, int idJuego) throws Exception
+    {
+        if (idGamer <= 0 || idJuego <= 0) throw new Exception("Ids inválidos");
+        return gamerModel.desinstalarJuegoEnBiblioteca(idGamer, idJuego);
+    }
 }
