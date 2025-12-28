@@ -8,12 +8,6 @@ public class SolicitudCompra implements Serializable
     private int idUsuario;
     private int idJuego;
     private Date fechaSimulada;
-    private boolean yaLoTiene;
-    
-    public SolicitudCompra(boolean yaLoTiene) 
-    {
-        this.yaLoTiene = yaLoTiene;
-    }
     
     public int getIdUsuario()
     {
@@ -43,15 +37,5 @@ public class SolicitudCompra implements Serializable
     public void setFechaSimulada(Date fechaSimulada)
     {
         this.fechaSimulada = fechaSimulada;
-    }
-    
-    public boolean isYaLoTiene() 
-    {
-        return yaLoTiene;
-    }
-    
-    public void setYaLoTiene(boolean yaLoTiene) 
-    {
-        this.yaLoTiene = yaLoTiene;
     }
 }

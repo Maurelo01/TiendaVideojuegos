@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.models;
 
+import com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
@@ -8,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Base64;
+import java.util.List;
 
 public class UsuarioComunGamer
 {
@@ -191,5 +193,38 @@ public class UsuarioComunGamer
             e.printStackTrace();
         }
         return 0.0f;
+    }
+    
+    public List<BibliotecaDTO> obtenerBiblioteca(int idGamer)
+    {
+        List<BibliotecaDTO> lista = new java.util.ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT v.id_juego, v.titulo, v.imagen_portada, b.estado_instalacion, b.fecha_adquisicion " +
+                     "FROM Biblioteca_Personal b JOIN Videojuego v ON b.id_juego = v.id_juego WHERE b.id_gamer = ? ORDER BY b.fecha_adquisicion DESC"))
+        {
+            ps.setInt(1, idGamer);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    var item = new com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO();
+                    item.setIdJuego(rs.getInt("id_juego"));
+                    item.setTitulo(rs.getString("titulo"));
+                    item.setEstadoInstalacion(rs.getString("estado_instalacion"));
+                    item.setFechaAdquisicion(rs.getDate("fecha_adquisicion"));
+                    byte[] imgBytes = rs.getBytes("imagen_portada");
+                    if (imgBytes != null && imgBytes.length > 0)
+                    {
+                        item.setImagen(java.util.Base64.getEncoder().encodeToString(imgBytes));
+                    }
+                    lista.add(item);
+                }
+            }
+        }
+        catch (Exception e) 
+        {
+            System.err.println("Error listando biblioteca: " + e.getMessage());
+        }
+        return lista;
     }
 }

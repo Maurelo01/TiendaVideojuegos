@@ -1,6 +1,5 @@
 package com.mycompany.tiendavideojuegos.resources;
 
-import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaRecarga;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudLogin;
@@ -229,6 +228,21 @@ public class UsuariosResource
             System.err.println("Error en recargarCartera: " + e.getMessage());
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError("Error interno del servidor")).build();
+        }
+    }
+    
+    @GET
+    @Path("gamer/{id}/biblioteca") // /api/usuarios/gamer/{id}/biblioteca
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verBiblioteca(@PathParam("id") int id)
+    {
+        try
+        {
+            return Response.ok(service.obtenerBibliotecaGamer(id)).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Error al cargar biblioteca: " + e.getMessage())).build();
         }
     }
 }
