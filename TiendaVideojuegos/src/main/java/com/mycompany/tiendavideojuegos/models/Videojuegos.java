@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -33,12 +34,12 @@ public class Videojuegos
             ps.setBoolean(8, true);
             if (juego.getImagen() != null && !juego.getImagen().isEmpty()) 
             {
-                byte[] imagenBytes = java.util.Base64.getDecoder().decode(juego.getImagen());
+                byte[] imagenBytes = Base64.getDecoder().decode(juego.getImagen());
                 ps.setBytes(9, imagenBytes);
             } 
             else 
             {
-                ps.setNull(9, java.sql.Types.BLOB);
+                ps.setNull(9, Types.BLOB);
             }
             int filas = ps.executeUpdate();
             if (filas == 0) 
@@ -110,7 +111,7 @@ public class Videojuegos
         {
             try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Videojuego WHERE id_empresa = ?")) {
                 ps.setInt(1, idEmpresa);
-                try (java.sql.ResultSet rs = ps.executeQuery()) 
+                try (ResultSet rs = ps.executeQuery()) 
                 {
                     while (rs.next())
                     {
@@ -157,7 +158,7 @@ public class Videojuegos
                 byte[] imgBytes = rs.getBytes("imagen_portada");
                 if (imgBytes != null && imgBytes.length > 0) 
                 {
-                    String base64 = java.util.Base64.getEncoder().encodeToString(imgBytes);
+                    String base64 = Base64.getEncoder().encodeToString(imgBytes);
                     juego.setImagen(base64);
                 } 
                 else 
@@ -198,7 +199,7 @@ public class Videojuegos
                 {
                     try (PreparedStatement psImg = conn.prepareStatement("UPDATE Videojuego SET imagen_portada = ? WHERE id_juego = ?")) 
                     {
-                        byte[] imagenBytes = java.util.Base64.getDecoder().decode(juego.getImagen());
+                        byte[] imagenBytes = Base64.getDecoder().decode(juego.getImagen());
                         psImg.setBytes(1, imagenBytes);
                         psImg.setInt(2, juego.getIdJuego());
                         psImg.executeUpdate();
@@ -215,7 +216,7 @@ public class Videojuegos
                     // Insertar nuevas categorias 
                     if (!juego.getIdsCategorias().isEmpty()) 
                     {
-                        try (java.sql.PreparedStatement psInsCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)")) 
+                        try (PreparedStatement psInsCat = conn.prepareStatement("INSERT INTO Juego_Categoria (id_juego, id_categoria) VALUES (?, ?)")) 
                         {
                             for (Integer idCat : juego.getIdsCategorias())
                             {
@@ -301,7 +302,7 @@ public class Videojuegos
         try 
         {
             base64 = base64.replaceAll("\\s", ""); 
-            return java.util.Base64.getDecoder().decode(base64);
+            return Base64.getDecoder().decode(base64);
         }
         catch (IllegalArgumentException e)
         {
@@ -328,7 +329,7 @@ public class Videojuegos
                     byte[] contenidoBytes = rs.getBytes("contenido");
                     if (contenidoBytes != null && contenidoBytes.length > 0)
                     {
-                        String base64 = java.util.Base64.getEncoder().encodeToString(contenidoBytes);
+                        String base64 = Base64.getEncoder().encodeToString(contenidoBytes);
                         media.setContenido(base64); 
                     }
                     lista.add(media);
@@ -356,5 +357,64 @@ public class Videojuegos
             System.err.println("Error eliminando multimedia: " + e.getMessage());
             return false;
         }
+    }
+    
+    public List<VideojuegosDTO> buscarJuegos(String titulo, Integer idCategoria) 
+    {
+        List<VideojuegosDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        StringBuilder juegoSql = new StringBuilder("SELECT DISTINCT v.* FROM Videojuego v ");
+        if (idCategoria != null && idCategoria > 0) 
+        {
+            juegoSql.append("JOIN Juego_Categoria jc ON v.id_juego = jc.id_juego ");
+        }
+        juegoSql.append("JOIN Empresa e ON v.id_empresa = e.id_empresa ");
+        juegoSql.append("WHERE v.estado = 'ACTIVO' AND e.estado = 'ACTIVO' ");
+        if (titulo != null && !titulo.trim().isEmpty())
+        {
+            juegoSql.append("AND v.titulo LIKE ? ");
+        }
+        if (idCategoria != null && idCategoria > 0)
+        {
+            juegoSql.append("AND jc.id_categoria = ? ");
+        }
+        try (PreparedStatement ps = conn.prepareStatement(juegoSql.toString())) 
+        {
+            int indice = 1;
+            if (titulo != null && !titulo.trim().isEmpty())
+            {
+                ps.setString(indice++, "%" + titulo + "%");
+            }
+            if (idCategoria != null && idCategoria > 0)
+            {
+                ps.setInt(indice++, idCategoria);
+            }
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    VideojuegosDTO juego = new VideojuegosDTO();
+                    juego.setIdJuego(rs.getInt("id_juego"));
+                    juego.setIdEmpresa(rs.getInt("id_empresa"));
+                    juego.setTitulo(rs.getString("titulo"));
+                    juego.setDescripcion(rs.getString("descripcion"));
+                    juego.setPrecio(rs.getFloat("precio"));
+                    juego.setRecursosMinimos(rs.getString("recursos_minimos"));
+                    juego.setClasificacionEdad(rs.getString("clasificacion_edad"));
+                    juego.setEstado(rs.getString("estado"));
+                    byte[] imgBytes = rs.getBytes("imagen_portada");
+                    if (imgBytes != null && imgBytes.length > 0)
+                    {
+                        juego.setImagen(java.util.Base64.getEncoder().encodeToString(imgBytes));
+                    }
+                    lista.add(juego);
+                }
+            }
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error en búsqueda: " + e.getMessage());
+        }
+        return lista;
     }
 }
