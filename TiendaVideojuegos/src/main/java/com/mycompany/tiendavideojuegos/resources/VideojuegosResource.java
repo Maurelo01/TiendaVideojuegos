@@ -11,6 +11,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
@@ -184,6 +185,22 @@ public class VideojuegosResource
         catch (Exception e) 
         {
             return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("buscar") // /api/videojuegos/buscar
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response buscarJuegos(@QueryParam("titulo") String titulo, @QueryParam("idCategoria") Integer idCategoria) 
+    {
+        try 
+        {
+            List<VideojuegosDTO> resultados = service.buscar(titulo, idCategoria);
+            return Response.ok(resultados).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al buscar: " + e.getMessage()).build();
         }
     }
 }

@@ -141,4 +141,9 @@ public class VideojuegosService
         }
         return modelo.eliminarMultimedia(idMedia);
     }
+    
+    public List<VideojuegosDTO> buscar(String titulo, Integer idCategoria) 
+    {
+        return modelo.buscarJuegos(titulo, idCategoria);
+    }
 }
