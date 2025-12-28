@@ -3,6 +3,7 @@ package com.mycompany.tiendavideojuegos.resources;
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudLogin;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudRegistroEmpresa;
+import com.mycompany.tiendavideojuegos.DTO.SolicitudSaldo;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
@@ -197,6 +198,23 @@ public class UsuariosResource
         catch (Exception e) 
         {
             return Response.status(Response.Status.NOT_FOUND).entity("Error: " + e.getMessage()).build();
+        }
+    }
+    
+    @POST
+    @Path("gamer/{id}/recargar") // /api/usuarios/gamer/{id}/recargar
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response recargarCartera(@PathParam("id") int idUsuario, SolicitudSaldo solicitud) 
+    {
+        try 
+        {
+            double nuevoSaldo = service.recargarSaldo(idUsuario, solicitud.getMonto());
+            return Response.ok("{\"mensaje\": \"Recarga exitosa\", \"nuevoSaldo\": " + nuevoSaldo + "}").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Error: " + e.getMessage()).build();
         }
     }
 }
