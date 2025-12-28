@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.services;
 
+import com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO;
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
@@ -251,5 +252,14 @@ public class UsuariosService
         {
             throw new Exception("No se pudo realizar la recarga. Verifica que el usuario exista.");
         }
+    }
+    
+    public List<BibliotecaDTO> obtenerBibliotecaGamer(int idGamer) throws Exception 
+    {
+        if (idGamer <= 0)
+        {
+            throw new Exception("Id de gamer inválido.");
+        }
+        return gamerModel.obtenerBiblioteca(idGamer);
     }
 }

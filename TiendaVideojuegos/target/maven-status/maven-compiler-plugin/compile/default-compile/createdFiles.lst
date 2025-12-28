@@ -1,8 +1,10 @@
 com/mycompany/tiendavideojuegos/services/AdminService.class
+com/mycompany/tiendavideojuegos/DTO/RespuestaVerificacion.class
 com/mycompany/tiendavideojuegos/resources/VideojuegosResource.class
 com/mycompany/tiendavideojuegos/DTO/MultimediaDTO.class
 com/mycompany/tiendavideojuegos/configuracion/ConexionDB.class
 com/mycompany/tiendavideojuegos/configuracion/CorsFilter.class
+com/mycompany/tiendavideojuegos/DTO/BibliotecaDTO.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudRegistroEmpresa.class
 com/mycompany/tiendavideojuegos/DTO/RespuestaExito.class

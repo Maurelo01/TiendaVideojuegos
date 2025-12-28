@@ -2,6 +2,7 @@ package com.mycompany.tiendavideojuegos.resources;
 
 import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaExito;
+import com.mycompany.tiendavideojuegos.DTO.RespuestaVerificacion;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.services.VentasService;
 import jakarta.ws.rs.Consumes;
@@ -46,13 +47,11 @@ public class VentasResource
         try
         {
             boolean yaLoTiene = service.verificarJuegoEnBiblioteca(idUsuario, idJuego);
-            return Response.ok(new SolicitudCompra(yaLoTiene)).build();
+            return Response.ok(new RespuestaVerificacion(yaLoTiene)).build();
         }
         catch (Exception e)
         {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity(new RespuestaError(e.getMessage()))
-                           .build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError(e.getMessage())).build();
         }
     }
 }
