@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class Videojuegos
@@ -56,19 +57,7 @@ public class Videojuegos
                 // Insertar multimedia
                 if (juego.getMultimedia() != null && !juego.getMultimedia().isEmpty()) 
                 {
-                    try (PreparedStatement psMedia = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)")) 
-                    {
-                        for (MultimediaDTO media : juego.getMultimedia()) 
-                        {
-                            psMedia.setInt(1, idJuegoGenerado);
-                            psMedia.setString(2, media.getUrl());
-                            psMedia.setString(3, media.getTipo());
-                            if (psMedia.executeUpdate() == 0)
-                            {
-                                throw new Exception("Error insertando multimedia");
-                            }
-                        }
-                    }
+                    agregarMultimedia(idJuegoGenerado, juego.getMultimedia());
                 }
                 // Insertar categorias
                 if (juego.getIdsCategorias() != null && !juego.getIdsCategorias().isEmpty()) 
@@ -97,7 +86,7 @@ public class Videojuegos
             {
                 try 
                 {
-                    try (java.sql.PreparedStatement psDel = conn.prepareStatement("DELETE FROM Videojuego WHERE id_juego = ?")) 
+                    try (PreparedStatement psDel = conn.prepareStatement("DELETE FROM Videojuego WHERE id_juego = ?")) 
                     {
                         psDel.setInt(1, idJuegoGenerado);
                         psDel.executeUpdate();
@@ -192,7 +181,7 @@ public class Videojuegos
         try
         {
             int filas;
-            try (java.sql.PreparedStatement ps = conn.prepareStatement("UPDATE Videojuego SET titulo=?, descripcion=?, precio=?, recursos_minimos=?, clasificacion_edad=?, comentarios_estado=? WHERE id_juego=?")) 
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE Videojuego SET titulo=?, descripcion=?, precio=?, recursos_minimos=?, clasificacion_edad=?, comentarios_estado=? WHERE id_juego=?")) 
             {
                 ps.setString(1, juego.getTitulo());
                 ps.setString(2, juego.getDescripcion());
@@ -248,16 +237,7 @@ public class Videojuegos
                     // Insertar nueva
                     if (!juego.getMultimedia().isEmpty()) 
                     {
-                        try (PreparedStatement psInsMed = conn.prepareStatement("INSERT INTO Multimedia (id_juego, url, tipo) VALUES (?, ?, ?)")) 
-                        {
-                            for (MultimediaDTO media : juego.getMultimedia())
-                            {
-                                psInsMed.setInt(1, juego.getIdJuego());
-                                psInsMed.setString(2, media.getUrl());
-                                psInsMed.setString(3, media.getTipo());
-                                psInsMed.executeUpdate();
-                            }
-                        }
+                        agregarMultimedia(juego.getIdJuego(), juego.getMultimedia());
                     }
                 }
                 exito = true;
@@ -285,6 +265,95 @@ public class Videojuegos
         catch (SQLException e) 
         {
             System.err.println("Error actualizando estado del juego: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public boolean agregarMultimedia(int idJuego, List<MultimediaDTO> lista)
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO Multimedia (id_juego, contenido, tipo) VALUES (?, ?, ?)"))
+        {
+            for (MultimediaDTO media : lista)
+            {
+                ps.setInt(1, idJuego);
+                ps.setBytes(2, decodeBase64(media.getContenido()));
+                ps.setString(3, media.getTipo());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            return true;
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    private byte[] decodeBase64(String base64)
+    {
+        if (base64 == null || base64.trim().isEmpty()) return null;
+        if (base64.contains(",")) 
+        {
+            base64 = base64.split(",")[1];
+        }
+        try 
+        {
+            base64 = base64.replaceAll("\\s", ""); 
+            return java.util.Base64.getDecoder().decode(base64);
+        }
+        catch (IllegalArgumentException e)
+        {
+            System.err.println("Error decodificando Base64: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    public List<MultimediaDTO> obtenerMultimedia(int idJuego)
+    {
+        List<MultimediaDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Multimedia WHERE id_juego = ?"))
+        {
+            ps.setInt(1, idJuego);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    MultimediaDTO media = new MultimediaDTO();
+                    media.setIdMedia(rs.getInt("id_media"));
+                    media.setIdJuego(rs.getInt("id_juego"));
+                    media.setTipo(rs.getString("tipo"));
+                    byte[] contenidoBytes = rs.getBytes("contenido");
+                    if (contenidoBytes != null && contenidoBytes.length > 0)
+                    {
+                        String base64 = java.util.Base64.getEncoder().encodeToString(contenidoBytes);
+                        media.setContenido(base64); 
+                    }
+                    lista.add(media);
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.err.println("Error obteniendo multimedia: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public boolean eliminarMultimedia(int idMedia) 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Multimedia WHERE id_media = ?")) 
+        {
+            ps.setInt(1, idMedia);
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+        } 
+        catch (SQLException e) 
+        {
+            System.err.println("Error eliminando multimedia: " + e.getMessage());
             return false;
         }
     }
