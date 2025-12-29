@@ -4,6 +4,7 @@ import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaExito;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaVerificacion;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
+import com.mycompany.tiendavideojuegos.services.ReportesService;
 import com.mycompany.tiendavideojuegos.services.VentasService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -14,11 +15,14 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("ventas")
 public class VentasResource 
 {
     private final VentasService service = new VentasService();
+    private final ReportesService reporteService = new ReportesService();
 
     @POST
     @Path("comprar") // api/ventas/comprar
@@ -98,6 +102,68 @@ public class VentasResource
         catch (Exception e)
         {
             return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Error al cargar historial: " + e.getMessage())).build();
+        }
+    }
+      
+    @GET
+    @Path("reporte/admin/pdf")  // api/ventas/reporte/admin/pdf
+    @Produces("application/pdf")
+    public Response descargarReporteAdminPdf(@QueryParam("inicio") String inicio, @QueryParam("fin") String fin) 
+    {
+        try 
+        {
+            var listaDatos = service.obtenerReporteAdmin(inicio, fin);
+            Map<String, Object> parametros = new HashMap<>();
+            parametros.put("FECHA_INICIO", inicio != null ? inicio : "Histórico");
+            parametros.put("FECHA_FIN", fin != null ? fin : "Actualidad");
+            parametros.put("TITULO_REPORTE", "Reporte Financiero Global");
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteAdmin.jasper", parametros, listaDatos);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Reporte_Admin.pdf").build();
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+            return Response.serverError().entity("Error generando PDF: " + e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("reporte/empresa/{id}/pdf") // api/ventas/reporte/empresa/{id}/pdf
+    @Produces("application/pdf")
+    public Response descargarReporteEmpresaPdf(@PathParam("id") int idEmpresa, @QueryParam("inicio") String inicio, @QueryParam("fin") String fin) 
+    {
+        try 
+        {
+            var listaDatos = service.obtenerReporteEmpresa(idEmpresa, inicio, fin);
+            Map<String, Object> parametros = new HashMap<>();
+            parametros.put("FECHA_INICIO", inicio != null ? inicio : "Histórico");
+            parametros.put("FECHA_FIN", fin != null ? fin : "Actualidad");
+            parametros.put("TITULO_REPORTE", "Reporte de Ventas por Juego");
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteEmpresa.jasper", parametros, listaDatos);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Reporte_Empresa_" + idEmpresa + ".pdf").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().entity("Error generando PDF: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("historial/{id}/pdf") // api/ventas/reporte/historial/{id}/pdf
+    @Produces("application/pdf")
+    public Response descargarHistorialPdf(@PathParam("id") int idUsuario) 
+    {
+        try 
+        {
+            var listaDatos = service.obtenerHistorial(idUsuario);
+            Map<String, Object> parametros = new HashMap<>();
+            parametros.put("TITULO_REPORTE", "Historial de Compras");
+            byte[] pdfBytes = reporteService.generarReportePDF("HistorialUsuario.jasper", parametros, listaDatos);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Mis_Compras.pdf").build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().entity("Error generando PDF: " + e.getMessage()).build();
         }
     }
 }
