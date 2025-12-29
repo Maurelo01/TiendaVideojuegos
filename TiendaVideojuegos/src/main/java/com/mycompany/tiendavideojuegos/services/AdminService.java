@@ -129,6 +129,19 @@ public class AdminService
         {
             throw new Exception("El nombre es obligatorio");
         }
+        
+        if (empresa.getPorcentajeComisionEspecifica() > 0) 
+        {
+            ConfiguracionDTO config = modeloConfig.obtenerConfiguracion();
+            if (config != null) 
+            {
+                float comisionGlobal = config.getComisionGlobalActual();
+                if (empresa.getPorcentajeComisionEspecifica() > comisionGlobal) 
+                {
+                    throw new Exception("La comisión específica (" + empresa.getPorcentajeComisionEspecifica() + "%) no puede ser mayor a la comisión global actual (" + comisionGlobal + "%).");
+                }
+            }
+        }
         return modeloEmpresa.actualizarEmpresa(empresa);
     }
     

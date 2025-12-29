@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -197,7 +198,7 @@ public class UsuarioComunGamer
     
     public List<BibliotecaDTO> obtenerBiblioteca(int idGamer)
     {
-        List<BibliotecaDTO> lista = new java.util.ArrayList<>();
+        List<BibliotecaDTO> lista = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
         try (PreparedStatement ps = conn.prepareStatement("SELECT v.id_juego, v.titulo, v.imagen_portada, b.estado_instalacion, b.fecha_adquisicion " +
                      "FROM Biblioteca_Personal b JOIN Videojuego v ON b.id_juego = v.id_juego WHERE b.id_gamer = ? ORDER BY b.fecha_adquisicion DESC"))
@@ -215,7 +216,7 @@ public class UsuarioComunGamer
                     byte[] imgBytes = rs.getBytes("imagen_portada");
                     if (imgBytes != null && imgBytes.length > 0)
                     {
-                        item.setImagen(java.util.Base64.getEncoder().encodeToString(imgBytes));
+                        item.setImagen(Base64.getEncoder().encodeToString(imgBytes));
                     }
                     lista.add(item);
                 }

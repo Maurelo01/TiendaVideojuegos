@@ -95,7 +95,7 @@ public class Usuario
         return gamer;
     }
     
-    private UsuarioEmpresaDTO obtenerEmpresaCompleto(java.sql.Connection conn, int idUsuario, ResultSet rsPadre) throws Exception 
+    private UsuarioEmpresaDTO obtenerEmpresaCompleto(Connection conn, int idUsuario, ResultSet rsPadre) throws Exception 
     {
         var empresa = new UsuarioEmpresaDTO();
         llenarDatos(empresa, rsPadre);
