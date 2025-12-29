@@ -85,4 +85,19 @@ public class VentasResource
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError(e.getMessage())).build();
         }
     }
+    
+    @GET
+    @Path("historial/{idUsuario}") // api/ventas/historial/{idUsuario}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verHistorial(@PathParam("idUsuario") int idUsuario)
+    {
+        try
+        {
+            return Response.ok(service.obtenerHistorial(idUsuario)).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Error al cargar historial: " + e.getMessage())).build();
+        }
+    }
 }

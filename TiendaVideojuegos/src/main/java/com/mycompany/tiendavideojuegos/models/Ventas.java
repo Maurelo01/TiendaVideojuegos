@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.models;
 
+import com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
@@ -275,6 +276,39 @@ public class Ventas
         }
         catch (Exception e)
         {
+        }
+        return lista;
+    }
+    
+    public List<HistorialComprasDTO> obtenerHistorialUsuario(int idUsuario) 
+    {
+        List<com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+
+        String calculoSql = "SELECT v.fecha_compra, j.titulo, v.precio_de_compra " +
+                            "FROM Venta v " +
+                            "JOIN Videojuego j ON v.id_juego = j.id_juego " +
+                            "WHERE v.id_gamer = ? " +
+                            "ORDER BY v.fecha_compra DESC";
+
+        try (PreparedStatement ps = conn.prepareStatement(calculoSql)) 
+        {
+            ps.setInt(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    var item = new com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO();
+                    item.setFechaCompra(rs.getDate("fecha_compra"));
+                    item.setTituloJuego(rs.getString("titulo"));
+                    item.setPrecioPagado(rs.getFloat("precio_de_compra"));
+                    lista.add(item);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error obteniendo historial de compras: " + e.getMessage());
         }
         return lista;
     }

@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.services;
 
+import com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
@@ -50,5 +51,11 @@ public class VentasService
     public List<ReporteAdminDTO> obtenerReporteAdmin(String inicio, String fin)
     {
         return modelo.generarReporteAdmin(inicio, fin);
+    }
+    
+    public List<HistorialComprasDTO> obtenerHistorial(int idUsuario) throws Exception
+    {
+        if (idUsuario <= 0) throw new Exception("Id de usuario inválido.");
+        return modelo.obtenerHistorialUsuario(idUsuario);
     }
 }

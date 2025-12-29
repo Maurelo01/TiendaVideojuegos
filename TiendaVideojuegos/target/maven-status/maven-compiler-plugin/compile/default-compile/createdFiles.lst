@@ -35,6 +35,7 @@ com/mycompany/tiendavideojuegos/DTO/ConfiguracionDTO.class
 com/mycompany/tiendavideojuegos/DTO/BannerDTO.class
 com/mycompany/tiendavideojuegos/resources/UsuariosResource.class
 com/mycompany/tiendavideojuegos/services/ComentariosService.class
+com/mycompany/tiendavideojuegos/DTO/HistorialComprasDTO.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudLogin.class
 com/mycompany/tiendavideojuegos/DTO/ComentarioDTO.class
 com/mycompany/tiendavideojuegos/models/Videojuegos.class
