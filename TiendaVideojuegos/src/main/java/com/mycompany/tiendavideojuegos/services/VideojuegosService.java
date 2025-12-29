@@ -146,4 +146,12 @@ public class VideojuegosService
     {
         return modelo.buscarJuegos(titulo, idCategoria);
     }
+    
+    public VideojuegosDTO obtenerJuegoPorId(int id) throws Exception
+    {
+        if (id <= 0) throw new Exception("Id inválido");
+        VideojuegosDTO juego = modelo.obtenerPorId(id);
+        if (juego == null) throw new Exception("Juego no encontrado");
+        return juego;
+    }
 }
