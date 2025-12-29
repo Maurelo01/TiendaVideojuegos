@@ -8,7 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class UsuarioEmpresa
@@ -29,12 +31,12 @@ public class UsuarioEmpresa
                 psEmpresa.setString(2, empresa.getDescripcion());
                 if (empresa.getImagenBanner() != null && !empresa.getImagenBanner().isEmpty()) 
                 {
-                    byte[] imagenBytes = java.util.Base64.getDecoder().decode(empresa.getImagenBanner());
+                    byte[] imagenBytes = Base64.getDecoder().decode(empresa.getImagenBanner());
                     psEmpresa.setBytes(3, imagenBytes);
                 }
                 else
                 {
-                    psEmpresa.setNull(3, java.sql.Types.BLOB);
+                    psEmpresa.setNull(3, Types.BLOB);
                 }
                 psEmpresa.executeUpdate();
                 try (ResultSet rsEmpresa = psEmpresa.getGeneratedKeys()) 
@@ -52,7 +54,7 @@ public class UsuarioEmpresa
                 psUsuario.setString(2, usuario.getContraseña());
                 psUsuario.setString(3, "EMPRESA");
                 psUsuario.executeUpdate();
-                try (java.sql.ResultSet rsUsuario = psUsuario.getGeneratedKeys()) 
+                try (ResultSet rsUsuario = psUsuario.getGeneratedKeys()) 
                 {
                     if (rsUsuario.next())
                     {
@@ -256,7 +258,7 @@ public class UsuarioEmpresa
                     byte[] imgBytes = rs.getBytes("imagen_banner");
                     if (imgBytes != null && imgBytes.length > 0)
                     {
-                        String base64 = java.util.Base64.getEncoder().encodeToString(imgBytes);
+                        String base64 = Base64.getEncoder().encodeToString(imgBytes);
                         empresa.setImagenBanner(base64);
                     }
                     else
@@ -273,9 +275,9 @@ public class UsuarioEmpresa
         return empresa;
     }
     
-    public java.util.List<EmpresaDTO> listarTodas() 
+    public List<EmpresaDTO> listarTodas() 
     {
-        java.util.List<EmpresaDTO> lista = new java.util.ArrayList<>();
+        List<EmpresaDTO> lista = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Empresa"); ResultSet rs = ps.executeQuery()) 
         {
@@ -290,7 +292,7 @@ public class UsuarioEmpresa
                 byte[] imgBytes = rs.getBytes("imagen_banner");
                 if (imgBytes != null && imgBytes.length > 0) 
                 {
-                    emp.setImagenBanner(java.util.Base64.getEncoder().encodeToString(imgBytes));
+                    emp.setImagenBanner(Base64.getEncoder().encodeToString(imgBytes));
                 }
                 lista.add(emp);
             }
@@ -326,11 +328,11 @@ public class UsuarioEmpresa
             }
             else
             {
-                ps.setNull(3, java.sql.Types.DECIMAL);
+                ps.setNull(3, Types.DECIMAL);
             }
             if (actualizarImagen)
             {
-                byte[] imgBytes = java.util.Base64.getDecoder().decode(empresa.getImagenBanner());
+                byte[] imgBytes = Base64.getDecoder().decode(empresa.getImagenBanner());
                 ps.setBytes(4, imgBytes);
                 ps.setInt(5, empresa.getIdEmpresa());
             }

@@ -418,7 +418,7 @@ public class Videojuegos
                     byte[] imgBytes = rs.getBytes("imagen_portada");
                     if (imgBytes != null && imgBytes.length > 0)
                     {
-                        juego.setImagen(java.util.Base64.getEncoder().encodeToString(imgBytes));
+                        juego.setImagen(Base64.getEncoder().encodeToString(imgBytes));
                     }
                     lista.add(juego);
                 }

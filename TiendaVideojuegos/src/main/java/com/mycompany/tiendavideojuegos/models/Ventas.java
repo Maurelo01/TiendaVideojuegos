@@ -6,6 +6,7 @@ import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,7 +46,7 @@ public class Ventas
 
         // Validar Saldo y Edad
         float saldoUsuario = 0;
-        java.sql.Date fechaNacimiento = null;
+        Date fechaNacimiento = null;
         
         try (PreparedStatement ps = conn.prepareStatement("SELECT fecha_nacimiento, saldo_cartera FROM Usuario_Comun_Gamer WHERE id_usuario = ?"))
         {
@@ -109,7 +110,7 @@ public class Ventas
         {
             ps.setInt(1, solicitud.getIdUsuario());
             ps.setInt(2, solicitud.getIdJuego());
-            ps.setDate(3, java.sql.Date.valueOf(fechaCompra));
+            ps.setDate(3, Date.valueOf(fechaCompra));
             ps.setFloat(4, precioJuego);
             ps.setFloat(5, porcentajeComision);
             ps.setFloat(6, gananciaPlataforma);
@@ -127,7 +128,7 @@ public class Ventas
         {
             ps.setInt(1, solicitud.getIdUsuario());
             ps.setInt(2, solicitud.getIdJuego());
-            ps.setDate(3, java.sql.Date.valueOf(fechaCompra));
+            ps.setDate(3, Date.valueOf(fechaCompra));
             ps.executeUpdate();
         }
         catch (Exception e)

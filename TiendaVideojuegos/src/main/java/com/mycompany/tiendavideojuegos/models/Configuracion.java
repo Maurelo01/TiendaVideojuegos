@@ -39,7 +39,7 @@ public class Configuracion
         try 
         {
             // Guardar valor anterior
-            try (PreparedStatement psLectura = conn.prepareStatement("SELECT comision_global_actual FROM Configuracion_Sistema LIMIT 1"); java.sql.ResultSet rs = psLectura.executeQuery()) 
+            try (PreparedStatement psLectura = conn.prepareStatement("SELECT comision_global_actual FROM Configuracion_Sistema LIMIT 1"); ResultSet rs = psLectura.executeQuery()) 
             {
                 if (rs.next())
                 {
@@ -60,6 +60,11 @@ public class Configuracion
                 {
                     psAjuste.setFloat(1, nuevaComision);
                     psAjuste.setFloat(2, nuevaComision);
+                    int afectados = psAjuste.executeUpdate();
+                    if (afectados > 0)
+                    {
+                        System.out.println("Ajuste automático: Se actualizaron " + afectados + " empresas.");
+                    }
                 }
                 exito = true;
             }

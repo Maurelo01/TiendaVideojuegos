@@ -9,8 +9,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @Path("comentarios")
-public class ComentariosResource {
-
+public class ComentariosResource 
+{
     private final ComentariosService service = new ComentariosService();
 
     @GET

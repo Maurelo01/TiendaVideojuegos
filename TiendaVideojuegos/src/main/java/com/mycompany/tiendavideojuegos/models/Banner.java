@@ -5,6 +5,7 @@ import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Base64;
@@ -28,7 +29,7 @@ public class Banner
                 }
                 else
                 {
-                    ps.setNull(3, java.sql.Types.BLOB);
+                    ps.setNull(3, Types.BLOB);
                 }
                 ps.setInt(4, banner.getLugar());
                 ps.setString(5, "ACTIVO");
@@ -49,7 +50,7 @@ public class Banner
         boolean exito = false;
         try 
         {
-            try (java.sql.PreparedStatement ps = conn.prepareStatement("DELETE FROM Banner_Principal WHERE id_banner = ?")) 
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM Banner_Principal WHERE id_banner = ?")) 
             {
                 ps.setInt(1, idBanner);
                 if (ps.executeUpdate() > 0)
