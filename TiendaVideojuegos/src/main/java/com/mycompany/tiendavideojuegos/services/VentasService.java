@@ -1,11 +1,14 @@
 package com.mycompany.tiendavideojuegos.services;
 
+import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import com.mycompany.tiendavideojuegos.models.Ventas;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 public class VentasService
 {
@@ -36,5 +39,16 @@ public class VentasService
                 return rs.next();
             }
         }
+    }
+    
+    public List<ReporteVentasEmpresaDTO> obtenerReporteEmpresa(int idEmpresa, String inicio, String fin) throws Exception
+    {
+        if (idEmpresa <= 0) throw new Exception("Id de empresa inválido");
+        return modelo.generarReporteEmpresa(idEmpresa, inicio, fin);
+    }
+    
+    public List<ReporteAdminDTO> obtenerReporteAdmin(String inicio, String fin)
+    {
+        return modelo.generarReporteAdmin(inicio, fin);
     }
 }
