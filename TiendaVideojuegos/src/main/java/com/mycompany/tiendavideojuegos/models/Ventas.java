@@ -1,5 +1,7 @@
 package com.mycompany.tiendavideojuegos.models;
 
+import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
@@ -8,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ventas 
 {    
@@ -187,5 +191,91 @@ public class Ventas
             default:
                 return true;
         }
+    }
+    
+    public List<ReporteVentasEmpresaDTO> generarReporteEmpresa(int idEmpresa, String fechaInicio, String fechaFin)
+    {
+        List<ReporteVentasEmpresaDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        if (fechaInicio == null || fechaInicio.isEmpty()) fechaInicio = "2020-01-01";
+        if (fechaFin == null || fechaFin.isEmpty()) fechaFin = "2030-12-31";
+
+        String operacionSql = "SELECT v.titulo, COUNT(t.id_venta) as cantidad, " +
+                            "SUM(t.precio_de_compra) as bruto, " +
+                            "SUM(t.ganancia_plataforma) as comision, " +
+                            "SUM(t.ganancia_empresa) as neto " +
+                            "FROM Venta t " +
+                            "JOIN Videojuego v ON t.id_juego = v.id_juego " +
+                            "WHERE v.id_empresa = ? AND t.fecha_compra BETWEEN ? AND ? " +
+                            "GROUP BY v.id_juego, v.titulo " +
+                            "ORDER BY neto DESC";
+
+        try (PreparedStatement ps = conn.prepareStatement(operacionSql))
+        {
+            ps.setInt(1, idEmpresa);
+            ps.setString(2, fechaInicio + " 00:00:00");
+            ps.setString(3, fechaFin + " 23:59:59");
+            
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next()) 
+                {
+                    var item = new ReporteVentasEmpresaDTO();
+                    item.setTituloJuego(rs.getString("titulo"));
+                    item.setCopiasVendidas(rs.getInt("cantidad"));
+                    item.setIngresosBrutos(rs.getFloat("bruto"));
+                    item.setComisionPlataforma(rs.getFloat("comision"));
+                    item.setGananciaNeta(rs.getFloat("neto"));
+                    lista.add(item);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error generando reporte empresa: " + e.getMessage());
+        }
+        return lista;
+    }
+    
+    public List<ReporteAdminDTO> generarReporteAdmin(String fechaInicio, String fechaFin)
+    {
+        List<ReporteAdminDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        if (fechaInicio == null || fechaInicio.isEmpty()) fechaInicio = "2020-01-01";
+        if (fechaFin == null || fechaFin.isEmpty()) fechaFin = "2030-12-31";
+
+        String operacionSql = "SELECT e.nombre_empresa, COUNT(t.id_venta) as cantidad, " +
+                            "SUM(t.precio_de_compra) as total_ingresos, " +
+                            "SUM(t.ganancia_plataforma) as ganancia_plataforma, " +
+                            "SUM(t.ganancia_empresa) as ganancia_empresa " +
+                            "FROM Venta t " +
+                            "JOIN Videojuego v ON t.id_juego = v.id_juego " +
+                            "JOIN Empresa e ON v.id_empresa = e.id_empresa " +
+                            "WHERE t.fecha_compra BETWEEN ? AND ? " +
+                            "GROUP BY e.id_empresa, e.nombre_empresa " +
+                            "ORDER BY ganancia_plataforma DESC";
+
+        try (PreparedStatement ps = conn.prepareStatement(operacionSql))
+        {
+            ps.setString(1, fechaInicio + " 00:00:00");
+            ps.setString(2, fechaFin + " 23:59:59");
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    var item = new ReporteAdminDTO();
+                    item.setNombreEmpresa(rs.getString("nombre_empresa"));
+                    item.setTotalVentas(rs.getInt("cantidad"));
+                    item.setTotalIngresos(rs.getFloat("total_ingresos"));
+                    item.setGananciaPlataforma(rs.getFloat("ganancia_plataforma"));
+                    item.setGananciaEmpresa(rs.getFloat("ganancia_empresa"));
+                    lista.add(item);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+        }
+        return lista;
     }
 }

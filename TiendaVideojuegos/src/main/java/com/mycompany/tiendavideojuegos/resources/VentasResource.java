@@ -11,6 +11,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -48,6 +49,36 @@ public class VentasResource
         {
             boolean yaLoTiene = service.verificarJuegoEnBiblioteca(idUsuario, idJuego);
             return Response.ok(new RespuestaVerificacion(yaLoTiene)).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
+    
+    @GET
+    @Path("reporte/empresa/{id}") // api/ventas/reporte/empresa/1?inicio=...&fin=...
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reporteEmpresa(@PathParam("id") int idEmpresa, @QueryParam("inicio") String inicio, @QueryParam("fin") String fin) 
+    {
+        try
+        {
+            return Response.ok(service.obtenerReporteEmpresa(idEmpresa, inicio, fin)).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
+
+    @GET
+    @Path("reporte/admin") // api/ventas/reporte/admin?inicio=...&fin=...
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reporteAdmin(@QueryParam("inicio") String inicio, @QueryParam("fin") String fin)
+    {
+        try
+        {
+            return Response.ok(service.obtenerReporteAdmin(inicio, fin)).build();
         }
         catch (Exception e)
         {
