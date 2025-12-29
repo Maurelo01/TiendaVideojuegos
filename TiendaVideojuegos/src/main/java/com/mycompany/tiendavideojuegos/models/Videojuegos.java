@@ -143,7 +143,19 @@ public class Videojuegos
     {
         List<VideojuegosDTO> lista = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT v.* FROM Videojuego v JOIN Empresa e ON v.id_empresa = e.id_empresa WHERE v.estado = 'ACTIVO' AND e.estado = 'ACTIVO'"); ResultSet rs = ps.executeQuery()) 
+        // Formula: (Ventas * 0.5) + (CalificacionPromedio * 2)
+        String calculoSql = "SELECT v.*, " +
+                            "COUNT(DISTINCT t.id_venta) as total_ventas, " +
+                            "COALESCE(AVG(c.calificacion), 0) as promedio_calificacion, " +
+                            "(COUNT(DISTINCT t.id_venta) * 0.5 + COALESCE(AVG(c.calificacion), 0) * 2) as puntaje_balance " +
+                            "FROM Videojuego v " +
+                            "JOIN Empresa e ON v.id_empresa = e.id_empresa " +
+                            "LEFT JOIN Venta t ON v.id_juego = t.id_juego " +
+                            "LEFT JOIN Comentario c ON v.id_juego = c.id_juego " +
+                            "WHERE v.estado = 'ACTIVO' AND e.estado = 'ACTIVO' " +
+                            "GROUP BY v.id_juego " +
+                            "ORDER BY puntaje_balance DESC";
+        try (PreparedStatement ps = conn.prepareStatement(calculoSql); ResultSet rs = ps.executeQuery()) 
         {
             while (rs.next()) 
             {
