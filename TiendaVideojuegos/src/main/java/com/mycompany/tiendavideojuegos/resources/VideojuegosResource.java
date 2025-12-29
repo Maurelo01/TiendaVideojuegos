@@ -1,6 +1,7 @@
 package com.mycompany.tiendavideojuegos.resources;
 
 import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
+import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.services.VideojuegosService;
 import jakarta.ws.rs.Consumes;
@@ -201,6 +202,21 @@ public class VideojuegosResource
         catch (Exception e) 
         {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error al buscar: " + e.getMessage()).build();
+        }
+    }
+    
+    @GET
+    @Path("{id}") // /api/videojuegos/{id}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerPorId(@PathParam("id") int id)
+    {
+        try
+        {
+            return Response.ok(service.obtenerJuegoPorId(id)).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.NOT_FOUND).entity(new RespuestaError(e.getMessage())).build();
         }
     }
 }

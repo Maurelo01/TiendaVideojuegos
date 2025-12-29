@@ -439,4 +439,43 @@ public class Videojuegos
         }
         return ids;
     }
+    
+    public VideojuegosDTO obtenerPorId(int idJuego)
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        VideojuegosDTO juego = null;
+        try (PreparedStatement ps = conn.prepareStatement("SELECT v.*, e.nombre_empresa FROM Videojuego v JOIN Empresa e ON v.id_empresa = e.id_empresa WHERE v.id_juego = ?"))
+        {
+            ps.setInt(1, idJuego);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    juego = new VideojuegosDTO();
+                    juego.setIdJuego(rs.getInt("id_juego"));
+                    juego.setIdEmpresa(rs.getInt("id_empresa"));
+                    juego.setNombreEmpresa(rs.getString("nombre_empresa")); // Útil para mostrar quién lo hizo
+                    juego.setTitulo(rs.getString("titulo"));
+                    juego.setDescripcion(rs.getString("descripcion"));
+                    juego.setPrecio(rs.getFloat("precio"));
+                    juego.setRecursosMinimos(rs.getString("recursos_minimos"));
+                    juego.setClasificacionEdad(rs.getString("clasificacion_edad"));
+                    juego.setEstado(rs.getString("estado"));
+                    juego.setFechaPublicacion(rs.getDate("fecha_publicacion"));
+                    
+                    byte[] imgBytes = rs.getBytes("imagen_portada");
+                    if (imgBytes != null && imgBytes.length > 0)
+                    {
+                        juego.setImagen(Base64.getEncoder().encodeToString(imgBytes));
+                    }
+                    juego.setIdsCategorias(obtenerCategoriasJuego(conn, idJuego));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error obteniendo juego por id: " + e.getMessage());
+        }
+        return juego;
+    }
 }
