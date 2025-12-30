@@ -1,4 +1,6 @@
 com/mycompany/tiendavideojuegos/services/AdminService.class
+com/mycompany/tiendavideojuegos/resources/GruposResource.class
+com/mycompany/tiendavideojuegos/models/GrupoFamiliar.class
 com/mycompany/tiendavideojuegos/resources/VideojuegosResource.class
 com/mycompany/tiendavideojuegos/configuracion/CorsFilter.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.class
@@ -8,6 +10,7 @@ com/mycompany/tiendavideojuegos/models/Usuario.class
 com/mycompany/tiendavideojuegos/DTO/VideojuegosDTO.class
 com/mycompany/tiendavideojuegos/DTO/RespuestaError.class
 com/mycompany/tiendavideojuegos/DTO/ReporteAdminDTO.class
+com/mycompany/tiendavideojuegos/DTO/SolicitudGrupoDTO.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudCompra.class
 com/mycompany/tiendavideojuegos/DTO/EmpresaDTO.class
 com/mycompany/tiendavideojuegos/models/Ventas.class
@@ -29,6 +32,7 @@ com/mycompany/tiendavideojuegos/DTO/BibliotecaDTO.class
 com/mycompany/tiendavideojuegos/DTO/RespuestaExito.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudSaldo.class
 com/mycompany/tiendavideojuegos/resources/VentasResource.class
+com/mycompany/tiendavideojuegos/services/GruposService.class
 com/mycompany/tiendavideojuegos/resources/ComentariosResource.class
 com/mycompany/tiendavideojuegos/DTO/ReporteVentasEmpresaDTO.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioEmpresaDTO.class
@@ -37,7 +41,9 @@ com/mycompany/tiendavideojuegos/models/Banner.class
 com/mycompany/tiendavideojuegos/models/Comentario.class
 com/mycompany/tiendavideojuegos/DTO/RespuestaRecarga.class
 com/mycompany/tiendavideojuegos/models/Configuracion.class
+com/mycompany/tiendavideojuegos/DTO/GrupoFamiliarDTO.class
 com/mycompany/tiendavideojuegos/DTO/ConfiguracionDTO.class
+com/mycompany/tiendavideojuegos/models/Prestamo.class
 com/mycompany/tiendavideojuegos/DTO/BannerDTO.class
 com/mycompany/tiendavideojuegos/resources/UsuariosResource.class
 com/mycompany/tiendavideojuegos/services/ComentariosService.class
