@@ -196,37 +196,74 @@ public class UsuarioComunGamer
         return 0.0f;
     }
     
-    public List<BibliotecaDTO> obtenerBiblioteca(int idGamer)
+    public List<BibliotecaDTO> obtenerBiblioteca(int idGamer) 
     {
-        List<BibliotecaDTO> lista = new ArrayList<>();
+        List<BibliotecaDTO> biblioteca = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT v.id_juego, v.titulo, v.imagen_portada, b.estado_instalacion, b.fecha_adquisicion " +
-                     "FROM Biblioteca_Personal b JOIN Videojuego v ON b.id_juego = v.id_juego WHERE b.id_gamer = ? ORDER BY b.fecha_adquisicion DESC"))
+        // Juegos comprados por el usuario
+        String misJuegosSql = 
+            "SELECT v.id_juego, v.titulo, v.imagen_portada, b.fecha_adquisicion, b.estado_instalacion, ? AS id_propietario, 'Tú' AS nickname_propietario, 0 AS es_prestamo_activo " +
+            "FROM Biblioteca_Personal b " +
+            "JOIN Videojuego v ON b.id_juego = v.id_juego " +
+            "WHERE b.id_gamer = ? ";
+        // Juegos del grupo familiar sin tomar los comprados por el usuario
+        String juegosFamiliaSql = 
+            "UNION " +
+            "SELECT v.id_juego, v.titulo, v.imagen_portada, bp_amigo.fecha_adquisicion, " +
+            "CASE " +
+            "WHEN p.id_usuario_recibe = ? THEN 'INSTALADO' " + 
+            "WHEN p.id_prestamo IS NOT NULL THEN 'OCUPADO' " +
+            "WHEN bp_amigo.estado_instalacion = 'INSTALADO' THEN 'OCUPADO' " +
+            "ELSE 'DISPONIBLE' " +
+            "END as estado_calculado, " +
+            "u_amigo.id_usuario as id_propietario, u_amigo.nickname as nickname_propietario, " +
+            "CASE WHEN p.id_usuario_recibe = ? THEN 1 ELSE 0 END AS es_prestamo_activo " +
+            "FROM Miembro_Grupo mg_yo " +
+            "JOIN Miembro_Grupo mg_amigo ON mg_yo.id_grupo = mg_amigo.id_grupo AND mg_amigo.id_usuario != ? " +
+            "JOIN Biblioteca_Personal bp_amigo ON mg_amigo.id_usuario = bp_amigo.id_gamer " +
+            "JOIN Usuario_Comun_Gamer u_amigo ON bp_amigo.id_gamer = u_amigo.id_usuario " +
+            "JOIN Videojuego v ON bp_amigo.id_juego = v.id_juego " +
+            "LEFT JOIN Prestamo_Biblioteca p ON p.id_juego = v.id_juego " +
+            "AND p.id_usuario_propietario = u_amigo.id_usuario " +
+            "AND p.fecha_devolucion IS NULL " +
+            "WHERE mg_yo.id_usuario = ? " +
+            "AND v.id_juego NOT IN (SELECT id_juego FROM Biblioteca_Personal WHERE id_gamer = ?) " +
+            "ORDER BY fecha_adquisicion DESC";
+        try (PreparedStatement ps = conn.prepareStatement(misJuegosSql + juegosFamiliaSql)) 
         {
-            ps.setInt(1, idGamer);
-            try (ResultSet rs = ps.executeQuery())
+            ps.setInt(1, idGamer); // id_propietario = id del usuario actual
+            ps.setInt(2, idGamer); // WHERE b.id_gamer = usuario actual
+            ps.setInt(3, idGamer); // CASE: id_recibe = usuario actual
+            ps.setInt(4, idGamer); // CASE: es_prestamo_activo
+            ps.setInt(5, idGamer); // JOIN: amigo != usuario actual
+            ps.setInt(6, idGamer); // WHERE mg_yo = usuario actual
+            ps.setInt(7, idGamer); // NOT IN (juegos del usuario actual)
+            try (ResultSet rs = ps.executeQuery()) 
             {
-                while (rs.next())
+                while (rs.next()) 
                 {
                     var item = new com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO();
                     item.setIdJuego(rs.getInt("id_juego"));
                     item.setTitulo(rs.getString("titulo"));
-                    item.setEstadoInstalacion(rs.getString("estado_instalacion"));
                     item.setFechaAdquisicion(rs.getDate("fecha_adquisicion"));
+                    item.setEstadoInstalacion(rs.getString("estado_instalacion"));
+                    item.setIdPropietario(rs.getInt("id_propietario"));
+                    item.setNombrePropietario(rs.getString("nickname_propietario"));
                     byte[] imgBytes = rs.getBytes("imagen_portada");
-                    if (imgBytes != null && imgBytes.length > 0)
+                    if (imgBytes != null && imgBytes.length > 0) 
                     {
                         item.setImagen(Base64.getEncoder().encodeToString(imgBytes));
                     }
-                    lista.add(item);
+                    biblioteca.add(item);
                 }
             }
-        }
+        } 
         catch (Exception e) 
         {
-            System.err.println("Error listando biblioteca: " + e.getMessage());
+            System.err.println("Error obteniendo biblioteca personal y familiar: " + e.getMessage());
+            e.printStackTrace();
         }
-        return lista;
+        return biblioteca;
     }
     
     public boolean instalarJuegoEnBiblioteca(int idGamer, int idJuego)
