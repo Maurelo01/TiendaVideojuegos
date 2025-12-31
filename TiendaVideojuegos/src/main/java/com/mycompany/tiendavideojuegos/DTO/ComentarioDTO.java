@@ -2,16 +2,20 @@ package com.mycompany.tiendavideojuegos.DTO;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ComentarioDTO implements Serializable
 {
     private int idComentario;
     private int idGamer;
     private int idJuego;
+    private int idComentarioPrincipal;
     private String nicknameGamer;
     private String texto;
     private int calificacion;
     private Timestamp fecha;
+    private List<ComentarioDTO> respuestas = new ArrayList<>();
 
     public int getIdComentario()
     {
@@ -81,5 +85,25 @@ public class ComentarioDTO implements Serializable
     public void setFecha(Timestamp fecha)
     {
         this.fecha = fecha;
+    }
+    
+    public int getIdComentarioPrincipal()
+    {
+        return idComentarioPrincipal;
+    }
+
+    public void setIdComentarioPrincipal(int idComentarioPrincipal)
+    {
+        this.idComentarioPrincipal = idComentarioPrincipal;
+    }
+
+    public List<ComentarioDTO> getRespuestas()
+    {
+        return respuestas;
+    }
+
+    public void setRespuestas(List<ComentarioDTO> respuestas)
+    {
+        this.respuestas = respuestas;
     }
 }
