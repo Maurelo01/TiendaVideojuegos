@@ -85,4 +85,23 @@ public class PrestamosService
             return ps.executeUpdate() > 0;
         }
     }
+    
+    private boolean yaTieneJuegoPrestado(Connection conn, int idUsuarioSolicitante) 
+    {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM Prestamo_Biblioteca WHERE id_usuario_recibe = ? AND fecha_devolucion IS NULL")) 
+        {
+            ps.setInt(1, idUsuarioSolicitante);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                return rs.next();
+            }
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+            return true;
+        }
+    }
+    
+    
 }
