@@ -18,6 +18,10 @@ public class PrestamosService
         {
             throw new Exception("El juego no está disponible en este momento (alguien más lo está jugando).");
         }
+        if (yaTieneJuegoPrestado(conn, idUsuarioSolicitante)) 
+        {
+            throw new Exception("Ya tienes un juego prestado instalado, debes devolverlo antes de solicitar otro.");
+        }
         try (PreparedStatement ps = conn.prepareStatement("INSERT INTO Prestamo_Biblioteca (id_usuario_recibe, id_juego, id_usuario_propietario, estado_instalacion, fecha_prestamo) VALUES (?, ?, ?, 'INSTALADO', NOW())")) 
         {
             ps.setInt(1, idUsuarioSolicitante);
@@ -85,7 +89,7 @@ public class PrestamosService
             return ps.executeUpdate() > 0;
         }
     }
-    
+
     private boolean yaTieneJuegoPrestado(Connection conn, int idUsuarioSolicitante) 
     {
         try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM Prestamo_Biblioteca WHERE id_usuario_recibe = ? AND fecha_devolucion IS NULL")) 
