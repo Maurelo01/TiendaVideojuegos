@@ -2,6 +2,7 @@ com/mycompany/tiendavideojuegos/services/AdminService.class
 com/mycompany/tiendavideojuegos/resources/GruposResource.class
 com/mycompany/tiendavideojuegos/models/GrupoFamiliar.class
 com/mycompany/tiendavideojuegos/resources/VideojuegosResource.class
+com/mycompany/tiendavideojuegos/DTO/SolicitudPrestamoDTO.class
 com/mycompany/tiendavideojuegos/configuracion/CorsFilter.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudRegistroEmpresa.class
@@ -48,5 +49,7 @@ com/mycompany/tiendavideojuegos/DTO/BannerDTO.class
 com/mycompany/tiendavideojuegos/resources/UsuariosResource.class
 com/mycompany/tiendavideojuegos/services/ComentariosService.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudLogin.class
+com/mycompany/tiendavideojuegos/services/PrestamosService.class
 com/mycompany/tiendavideojuegos/services/VentasService.class
+com/mycompany/tiendavideojuegos/resources/PrestamosResource.class
 com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.class
