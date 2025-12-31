@@ -266,4 +266,56 @@ public class GruposService
             throw new Exception("Error al eliminar el grupo: " + e.getMessage());
         }
     }
+    
+    public boolean salirGrupo(int idUsuario, int idGrupo) throws Exception 
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        if (!perteneceAGrupoEspecifico(conn, idUsuario, idGrupo)) 
+        {
+            throw new Exception("No perteneces a este grupo.");
+        }
+        if (esLiderDelGrupo(conn, idUsuario, idGrupo)) 
+        {
+            return eliminarGrupo(idUsuario, idGrupo);
+        } 
+        else 
+        {
+            try 
+            {
+                try (PreparedStatement psDevolver = conn.prepareStatement("UPDATE Prestamo_Biblioteca SET fecha_devolucion = NOW(), estado_instalacion = 'NO_INSTALADO' WHERE id_usuario_recibe = ? AND fecha_devolucion IS NULL")) 
+                {
+                    psDevolver.setInt(1, idUsuario);
+                    psDevolver.executeUpdate();
+                }
+                try (PreparedStatement psSalir = conn.prepareStatement("DELETE FROM Miembro_Grupo WHERE id_usuario = ? AND id_grupo = ?")) 
+                {
+                    psSalir.setInt(1, idUsuario);
+                    psSalir.setInt(2, idGrupo);
+                    return psSalir.executeUpdate() > 0;
+                }
+            } 
+            catch (Exception e) 
+            {
+                e.printStackTrace();
+                throw new Exception("Error al intentar salir del grupo: " + e.getMessage());
+            }
+        }
+    }
+    
+    private boolean perteneceAGrupoEspecifico(Connection conn, int idUsuario, int idGrupo) 
+    {
+        try (PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM Miembro_Grupo WHERE id_usuario = ? AND id_grupo = ?")) 
+        {
+            ps.setInt(1, idUsuario);
+            ps.setInt(2, idGrupo);
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                return rs.next();
+            }
+        } 
+        catch (Exception e) 
+        {
+            return false;
+        }
+    }
 }
