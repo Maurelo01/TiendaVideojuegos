@@ -2,7 +2,10 @@ package com.mycompany.tiendavideojuegos.services;
 
 import com.mycompany.tiendavideojuegos.DTO.ComentarioDTO;
 import com.mycompany.tiendavideojuegos.models.Comentario;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ComentariosService 
 {
@@ -14,16 +17,41 @@ public class ComentariosService
         {
             throw new Exception("El comentario no puede estar vacío.");
         }
-        if (comentario.getCalificacion() < 1 || comentario.getCalificacion() > 5)
+        if (comentario.getIdComentarioPrincipal() <= 0) 
         {
-            throw new Exception("La calificación debe estar entre 1 y 5 estrellas.");
+            if (comentario.getCalificacion() < 1 || comentario.getCalificacion() > 5)
+            {
+                throw new Exception("La calificación debe estar entre 1 y 5 estrellas.");
+            }
         }
         return modelo.agregar(comentario);
     }
 
     public List<ComentarioDTO> listarComentarios(int idJuego)
     {
-        return modelo.listarPorJuego(idJuego);
+        List<ComentarioDTO> todos = modelo.listarPorJuego(idJuego);
+        List<ComentarioDTO> raiz = new ArrayList<>();
+        Map<Integer, ComentarioDTO> mapa = new HashMap<>();
+        for (ComentarioDTO c : todos) 
+        {
+            mapa.put(c.getIdComentario(), c);
+        }
+        for (ComentarioDTO c : todos)
+        {
+            if (c.getIdComentarioPrincipal() > 0) 
+            {
+                ComentarioDTO padre = mapa.get(c.getIdComentarioPrincipal());
+                if (padre != null) 
+                {
+                    padre.getRespuestas().add(c);
+                }
+            }
+            else
+            {
+                raiz.add(c);
+            }
+        }
+        return raiz;
     }
 
     public boolean editarComentario(ComentarioDTO comentario) throws Exception

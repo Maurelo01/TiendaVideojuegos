@@ -13,12 +13,20 @@ public class Comentario
     public boolean agregar(ComentarioDTO comentario)
     {
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO Comentario (id_gamer, id_juego, texto, calificacion, fecha) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)"))
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO Comentario (id_gamer, id_juego, texto, calificacion, fecha, id_comentario_principal) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)"))
         {
             ps.setInt(1, comentario.getIdGamer());
             ps.setInt(2, comentario.getIdJuego());
             ps.setString(3, comentario.getTexto());
             ps.setInt(4, comentario.getCalificacion());
+            if (comentario.getIdComentarioPrincipal() > 0)
+            {
+                ps.setInt(5, comentario.getIdComentarioPrincipal());
+            }
+            else
+            {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            }
             return ps.executeUpdate() > 0;
         }
         catch (Exception e)
@@ -32,7 +40,7 @@ public class Comentario
     {
         List<ComentarioDTO> lista = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT c.*, u.nickname FROM Comentario c JOIN Usuario_Comun_Gamer u ON c.id_gamer = u.id_usuario WHERE c.id_juego = ? ORDER BY c.fecha DESC"))
+        try (PreparedStatement ps = conn.prepareStatement("SELECT c.*, u.nickname FROM Comentario c JOIN Usuario_Comun_Gamer u ON c.id_gamer = u.id_usuario WHERE c.id_juego = ? ORDER BY c.fecha ASC"))
         {
             ps.setInt(1, idJuego);
             try (ResultSet rs = ps.executeQuery())
@@ -47,6 +55,7 @@ public class Comentario
                     c.setTexto(rs.getString("texto"));
                     c.setCalificacion(rs.getInt("calificacion"));
                     c.setFecha(rs.getTimestamp("fecha"));
+                    c.setIdComentarioPrincipal(rs.getInt("id_comentario_principal"));
                     lista.add(c);
                 }
             }
