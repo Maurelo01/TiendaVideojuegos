@@ -117,4 +117,29 @@ public class GruposResource
             return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError(e.getMessage())).build();
         }
     }
+    
+    @DELETE
+    @Path("{idGrupo}/salir") // api/grupos/{idGrupo}/salir?idUsuario=4
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response salirDelGrupo(@PathParam("idGrupo") int idGrupo, @QueryParam("idUsuario") int idUsuario) 
+    {
+        try 
+        {
+            if (idUsuario <= 0) 
+            {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("Id de usuario inválido.")).build();
+            }
+
+            if (service.salirGrupo(idUsuario, idGrupo)) 
+            {
+                return Response.ok(new RespuestaExito("Has salido del grupo familiar correctamente.")).build();
+            }
+            
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError("No se pudo salir del grupo.")).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
 }
