@@ -3,6 +3,7 @@ package com.mycompany.tiendavideojuegos.services;
 import com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteRankingDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteTopJuegosDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
@@ -68,5 +69,10 @@ public class VentasService
     public List<ReporteRankingDTO> obtenerRankingReviewers() 
     {
         return modelo.obtenerTopReviewers();
+    }
+    
+    public List<ReporteTopJuegosDTO> obtenerTopJuegos(Integer idCategoria, String clasificacion) 
+    {
+        return modelo.obtenerTopJuegosBalance(idCategoria, clasificacion);
     }
 }
