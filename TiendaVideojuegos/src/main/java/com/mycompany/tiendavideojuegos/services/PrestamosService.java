@@ -1,12 +1,17 @@
 package com.mycompany.tiendavideojuegos.services;
 
+import com.mycompany.tiendavideojuegos.DTO.ReporteUsoFamiliarDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
+import com.mycompany.tiendavideojuegos.models.Prestamo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 public class PrestamosService 
 {
+    private final Prestamo prestamoModel = new Prestamo();
+    
     public boolean solicitarPrestamo(int idUsuarioSolicitante, int idJuego, int idPropietario) throws Exception 
     {
         Connection conn = ConexionDB.getInstance().getConnection();
@@ -107,5 +112,9 @@ public class PrestamosService
         }
     }
     
-    
+    public List<ReporteUsoFamiliarDTO> generarReporteUso(int idUsuario) throws Exception
+    {
+        if (idUsuario <= 0) throw new Exception("Id usuario inválido");
+        return prestamoModel.obtenerReporteUso(idUsuario);
+    }
 }

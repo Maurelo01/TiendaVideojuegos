@@ -59,4 +59,19 @@ public class PrestamosResource
             return Response.serverError().entity(new RespuestaError(e.getMessage())).build();
         }
     }
+    
+    @GET
+    @Path("reporte/usuario/{id}") // api/prestamos/reporte/usuario/{id}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerReporteUso(@PathParam("id") int idUsuario) 
+    {
+        try 
+        {
+            return Response.ok(service.generarReporteUso(idUsuario)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
 }   
