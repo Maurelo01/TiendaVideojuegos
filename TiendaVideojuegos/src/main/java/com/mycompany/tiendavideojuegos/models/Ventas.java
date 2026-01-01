@@ -2,6 +2,7 @@ package com.mycompany.tiendavideojuegos.models;
 
 import com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteRankingDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
@@ -310,6 +311,61 @@ public class Ventas
         catch (Exception e) 
         {
             System.err.println("Error obteniendo historial de compras: " + e.getMessage());
+        }
+        return lista;
+    }
+    
+    public List<ReporteRankingDTO> obtenerTopCompradores() 
+    {
+        List<ReporteRankingDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String topCompradoresSql = "SELECT u.nickname, COUNT(v.id_venta) as cantidad, COALESCE(SUM(v.precio_de_compra), 0) as total " +
+                     "FROM Usuario_Comun_Gamer u " +
+                     "JOIN Venta v ON u.id_usuario = v.id_gamer " +
+                     "GROUP BY u.id_usuario, u.nickname " +
+                     "ORDER BY cantidad DESC LIMIT 10";
+        try (PreparedStatement ps = conn.prepareStatement(topCompradoresSql); ResultSet rs = ps.executeQuery()) 
+        {
+            while (rs.next()) 
+            {
+                ReporteRankingDTO dto = new ReporteRankingDTO();
+                dto.setNickname(rs.getString("nickname"));
+                dto.setCantidad(rs.getInt("cantidad"));
+                dto.setTotalGastado(rs.getFloat("total"));
+                lista.add(dto);
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error obteniendo top compradores: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    public List<ReporteRankingDTO> obtenerTopReviewers() 
+    {
+        List<ReporteRankingDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String topReviewersSql = "SELECT u.nickname, COUNT(c.id_comentario) as cantidad " +
+                     "FROM Usuario_Comun_Gamer u " +
+                     "JOIN Comentario c ON u.id_usuario = c.id_gamer " +
+                     "GROUP BY u.id_usuario, u.nickname " +
+                     "ORDER BY cantidad DESC LIMIT 10";
+        
+        try (PreparedStatement ps = conn.prepareStatement(topReviewersSql); ResultSet rs = ps.executeQuery()) 
+        {
+            while (rs.next()) 
+            {
+                ReporteRankingDTO dto = new ReporteRankingDTO();
+                dto.setNickname(rs.getString("nickname"));
+                dto.setCantidad(rs.getInt("cantidad"));
+                dto.setTotalGastado(0);
+                lista.add(dto);
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error obteniendo top reviewers: " + e.getMessage());
         }
         return lista;
     }
