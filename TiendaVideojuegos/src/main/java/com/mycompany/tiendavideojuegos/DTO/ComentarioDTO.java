@@ -16,6 +16,7 @@ public class ComentarioDTO implements Serializable
     private int calificacion;
     private Timestamp fecha;
     private List<ComentarioDTO> respuestas = new ArrayList<>();
+    private boolean oculto;
 
     public int getIdComentario()
     {
@@ -105,5 +106,15 @@ public class ComentarioDTO implements Serializable
     public void setRespuestas(List<ComentarioDTO> respuestas)
     {
         this.respuestas = respuestas;
+    }
+    
+    public boolean isOculto()
+    {
+        return oculto;
+    }
+
+    public void setOculto(boolean oculto)
+    {
+        this.oculto = oculto;
     }
 }

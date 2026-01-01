@@ -79,4 +79,13 @@ public class ComentariosService
         }
         return true;
     }
+    
+    public boolean cambiarEstadoOculto(int idComentario, int idUsuario, boolean ocultar) throws Exception
+    {
+         if (!modelo.esModeradorDelComentario(idComentario, idUsuario))
+        {
+            throw new Exception("No tienes permisos para moderar este comentario.");
+        }
+        return modelo.cambiarVisibilidad(idComentario, ocultar);
+    }
 }
