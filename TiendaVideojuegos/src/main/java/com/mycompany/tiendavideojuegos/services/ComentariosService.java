@@ -1,6 +1,7 @@
 package com.mycompany.tiendavideojuegos.services;
 
 import com.mycompany.tiendavideojuegos.DTO.ComentarioDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteFeedbackDTO;
 import com.mycompany.tiendavideojuegos.models.Comentario;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,5 +88,15 @@ public class ComentariosService
             throw new Exception("No tienes permisos para moderar este comentario.");
         }
         return modelo.cambiarVisibilidad(idComentario, ocultar);
+    }
+    
+    public ReporteFeedbackDTO generarReporteFeedback(int idEmpresa) throws Exception
+    {
+        if (idEmpresa <= 0) throw new Exception("Id empresa inválido");
+        ReporteFeedbackDTO reporte = new ReporteFeedbackDTO();
+        reporte.setPromedios(modelo.obtenerPromediosPorEmpresa(idEmpresa));
+        reporte.setTopComentarios(modelo.obtenerTopComentados(idEmpresa));
+        reporte.setPeoresComentarios(modelo.obtenerPeoresComentarios(idEmpresa));
+        return reporte;
     }
 }
