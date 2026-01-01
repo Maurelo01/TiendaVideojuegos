@@ -4,6 +4,7 @@ import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaExito;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaVerificacion;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
+import com.mycompany.tiendavideojuegos.services.ComentariosService;
 import com.mycompany.tiendavideojuegos.services.ReportesService;
 import com.mycompany.tiendavideojuegos.services.VentasService;
 import jakarta.ws.rs.Consumes;
@@ -15,12 +16,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Path("ventas")
 public class VentasResource 
 {
+    private final ComentariosService comentariosService = new ComentariosService();
     private final VentasService service = new VentasService();
     private final ReportesService reporteService = new ReportesService();
 
@@ -222,6 +226,96 @@ public class VentasResource
             return Response.ok(service.obtenerTop5Empresa(idEmpresa, inicio, fin)).build();
         } 
         catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
+    
+    @GET
+    @Path("reporte/ranking/pdf") // api/ventas/reporte/ranking/pdf
+    @Produces("application/pdf")
+    public Response descargarRankingPdf() 
+    {
+        try 
+        {
+            var compradores = service.obtenerRankingCompradores();
+            var reviewers = service.obtenerRankingReviewers();
+            Map<String, Object> params = new HashMap<>();
+            params.put("TITULO_REPORTE", "Ranking de Usuarios");
+            params.put("ReviewersDS", new JRBeanCollectionDataSource(reviewers));
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteRanking.jasper", params, compradores);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Ranking_Usuarios.pdf").build();
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("reporte/top-juegos/pdf") 
+    @Produces("application/pdf")
+    public Response descargarTopJuegosPdf(@QueryParam("categoria") Integer idCategoria, @QueryParam("edad") String edad) 
+    {
+        try 
+        {
+            var lista = service.obtenerTopJuegos(idCategoria, edad);
+            Map<String, Object> params = new HashMap<>();
+            params.put("TITULO_REPORTE", "Top Ventas y Calidad");
+            String infoFiltro = "Filtros: ";
+            if (idCategoria != null && idCategoria > 0) infoFiltro += "Categoría ID " + idCategoria + " ";
+            else infoFiltro += "Todas las Categorías ";
+            if (edad != null && !edad.isEmpty()) infoFiltro += "| Edad: " + edad;
+            else infoFiltro += "| Edad: Todas";
+            params.put("FILTRO_INFO", infoFiltro);
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteTopJuegos.jasper", params, lista);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Top_Juegos_Calidad.pdf").build();
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return Response.serverError().build();
+        }
+    }
+    
+    @GET
+    @Path("reporte/feedback/{id}/pdf") 
+    @Produces("application/pdf")
+    public Response descargarFeedbackPdf(@PathParam("id") int idEmpresa) 
+    {
+        try 
+        {
+            var feedback = comentariosService.generarReporteFeedback(idEmpresa);
+            Map<String, Object> params = new HashMap<>();
+            params.put("TITULO_REPORTE", "Reporte de Feedback y Calidad");
+            params.put("PromediosDS", new JRBeanCollectionDataSource(feedback.getPromedios()));
+            params.put("TopComentariosDS", new JRBeanCollectionDataSource(feedback.getTopComentarios()));
+            params.put("PeoresComentariosDS", new JRBeanCollectionDataSource(feedback.getPeoresComentarios()));
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteFeedback.jasper", params, Arrays.asList(new Object()));
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Feedback_Empresa.pdf").build();
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace(); return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("reporte/empresa/{id}/top5/pdf") 
+    @Produces("application/pdf")
+    public Response descargarTop5Pdf(@PathParam("id") int idEmpresa, @QueryParam("inicio") String inicio, @QueryParam("fin") String fin) 
+    {
+        try 
+        {
+            var lista = service.obtenerTop5Empresa(idEmpresa, inicio, fin);
+            Map<String, Object> params = new HashMap<>();
+            params.put("TITULO_REPORTE", "Top 5 Juegos Más Vendidos");
+            params.put("RANGO_FECHAS", "Del " + inicio + " al " + fin);
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteTop5.jasper", params, lista);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Top5_Ventas.pdf").build();
+        } 
+        catch (Exception e)
         {
             return Response.serverError().build();
         }

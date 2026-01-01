@@ -4,14 +4,18 @@ import com.mycompany.tiendavideojuegos.DTO.RespuestaError;
 import com.mycompany.tiendavideojuegos.DTO.RespuestaExito;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudPrestamoDTO; // Importamos el nuevo DTO
 import com.mycompany.tiendavideojuegos.services.PrestamosService;
+import com.mycompany.tiendavideojuegos.services.ReportesService;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("prestamos")
 public class PrestamosResource 
 {
     private final PrestamosService service = new PrestamosService();
+    private final ReportesService reporteService = new ReportesService();
 
     @POST
     @Path("solicitar") // api/prestamos/solicitar
@@ -70,6 +74,25 @@ public class PrestamosResource
             return Response.ok(service.generarReporteUso(idUsuario)).build();
         } 
         catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
+    
+    @GET
+    @Path("reporte/usuario/{id}/pdf")
+    @Produces("application/pdf")
+    public Response descargarUsoFamiliarPdf(@PathParam("id") int idUsuario) 
+    {
+        try 
+        {
+            var lista = service.generarReporteUso(idUsuario);
+            Map<String, Object> params = new HashMap<>();
+            params.put("TITULO_REPORTE", "Uso de Biblioteca Familiar");
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteUsoFamiliar.jasper", params, lista);
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Uso_Familiar.pdf").build();
+        } 
+        catch (Exception e)
         {
             return Response.serverError().build();
         }

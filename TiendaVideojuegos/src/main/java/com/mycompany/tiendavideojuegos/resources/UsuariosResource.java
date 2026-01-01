@@ -9,6 +9,7 @@ import com.mycompany.tiendavideojuegos.DTO.SolicitudSaldo;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
+import com.mycompany.tiendavideojuegos.services.ReportesService;
 import com.mycompany.tiendavideojuegos.services.UsuariosService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -21,11 +22,14 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("usuarios")
 public class UsuariosResource 
 {
     private final UsuariosService service = new UsuariosService();
+    private final ReportesService reporteService = new ReportesService();
     
     @POST // /api/usuarios/login
     @Path("login")
@@ -346,6 +350,27 @@ public class UsuariosResource
         catch (Exception e) 
         {
             return Response.serverError().build();
+        }
+    }
+    
+    @GET
+    @Path("gamer/{id}/analisis/pdf") 
+    @Produces("application/pdf")
+    public Response descargarAnalisisPdf(@PathParam("id") int idGamer) 
+    {
+        try 
+        {
+            var analisis = service.generarAnalisisGamer(idGamer);
+            Map<String, Object> params = new HashMap<>();
+            params.put("TITULO_REPORTE", "Análisis de Biblioteca Personal");
+            params.put("CategoriasDS", new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(analisis.getCategoriasFavoritas()));
+            params.put("ComparativaDS", new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(analisis.getComparativaCalificaciones()));
+            byte[] pdfBytes = reporteService.generarReportePDF("ReporteAnalisis.jasper", params, java.util.Arrays.asList(new Object()));
+            return Response.ok(pdfBytes).header("Content-Disposition", "attachment; filename=Mi_Analisis.pdf").build();
+        } 
+        catch (Exception e)
+        {
+            e.printStackTrace(); return Response.serverError().build();
         }
     }
 }

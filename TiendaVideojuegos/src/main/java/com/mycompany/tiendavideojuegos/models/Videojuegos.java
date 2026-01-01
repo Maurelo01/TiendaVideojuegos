@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.models;
 
+import com.mycompany.tiendavideojuegos.DTO.CategoriaDTO;
 import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
@@ -450,6 +451,27 @@ public class Videojuegos
             e.printStackTrace();
         }
         return ids;
+    }
+    
+    public List<CategoriaDTO> obtenerTodasLasCategorias()
+    {
+        List<CategoriaDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Categoria ORDER BY nombre_categoria ASC"); ResultSet rs = ps.executeQuery())
+        {
+            while (rs.next())
+            {
+                CategoriaDTO cat = new CategoriaDTO();
+                cat.setIdCategoria(rs.getInt("id_categoria"));
+                cat.setNombreCategoria(rs.getString("nombre_categoria"));
+                lista.add(cat);
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error al listar categorías: " + e.getMessage());
+        }
+        return lista;
     }
     
     public VideojuegosDTO obtenerPorId(int idJuego)
