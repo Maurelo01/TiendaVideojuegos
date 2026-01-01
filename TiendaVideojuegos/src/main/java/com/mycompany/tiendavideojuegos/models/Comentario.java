@@ -40,23 +40,24 @@ public class Comentario
     {
         List<ComentarioDTO> lista = new ArrayList<>();
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT c.*, u.nickname FROM Comentario c JOIN Usuario_Comun_Gamer u ON c.id_gamer = u.id_usuario WHERE c.id_juego = ? ORDER BY c.fecha ASC"))
+        try (PreparedStatement ps = conn.prepareStatement("SELECT c.*, u.nickname, c.oculto FROM Comentario c JOIN Usuario_Comun_Gamer u ON c.id_gamer = u.id_usuario WHERE c.id_juego = ? ORDER BY c.fecha ASC"))
         {
             ps.setInt(1, idJuego);
             try (ResultSet rs = ps.executeQuery())
             {
                 while (rs.next())
                 {
-                    ComentarioDTO c = new ComentarioDTO();
-                    c.setIdComentario(rs.getInt("id_comentario"));
-                    c.setIdGamer(rs.getInt("id_gamer"));
-                    c.setIdJuego(rs.getInt("id_juego"));
-                    c.setNicknameGamer(rs.getString("nickname"));
-                    c.setTexto(rs.getString("texto"));
-                    c.setCalificacion(rs.getInt("calificacion"));
-                    c.setFecha(rs.getTimestamp("fecha"));
-                    c.setIdComentarioPrincipal(rs.getInt("id_comentario_principal"));
-                    lista.add(c);
+                    ComentarioDTO comentario = new ComentarioDTO();
+                    comentario.setIdComentario(rs.getInt("id_comentario"));
+                    comentario.setIdGamer(rs.getInt("id_gamer"));
+                    comentario.setIdJuego(rs.getInt("id_juego"));
+                    comentario.setNicknameGamer(rs.getString("nickname"));
+                    comentario.setTexto(rs.getString("texto"));
+                    comentario.setCalificacion(rs.getInt("calificacion"));
+                    comentario.setFecha(rs.getTimestamp("fecha"));
+                    comentario.setIdComentarioPrincipal(rs.getInt("id_comentario_principal"));
+                    comentario.setOculto(rs.getBoolean("oculto"));
+                    lista.add(comentario);
                 }
             }
         }
@@ -67,8 +68,51 @@ public class Comentario
         return lista;
     }
     
-    // ... métodos agregar y listarPorJuego que ya tenías ...
-
+    public boolean cambiarVisibilidad(int idComentario, boolean ocultar)
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Comentario SET oculto = ? WHERE id_comentario = ?"))
+        {
+            ps.setBoolean(1, ocultar);
+            ps.setInt(2, idComentario);
+            return ps.executeUpdate() > 0;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean esModeradorDelComentario(int idComentario, int idUsuarioSolicitante)
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String verificarUsuarioSql = 
+            "SELECT 1 FROM Comentario c " +
+            "JOIN Videojuego v ON c.id_juego = v.id_juego " +
+            "LEFT JOIN Usuario_Empresa ue ON v.id_empresa = ue.id_empresa " +
+            "LEFT JOIN Usuario u ON u.id_usuario = ? " +
+            "WHERE c.id_comentario = ? " +
+            "AND (ue.id_usuario = ? OR u.rol = 'ADMIN') " +
+            "LIMIT 1";
+            
+        try (PreparedStatement ps = conn.prepareStatement(verificarUsuarioSql))
+        {
+            ps.setInt(1, idUsuarioSolicitante); // Para verificar admin
+            ps.setInt(2, idComentario);
+            ps.setInt(3, idUsuarioSolicitante); // Para verificar empresa
+            try (ResultSet rs = ps.executeQuery())
+            {
+                return rs.next();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     public boolean actualizar(ComentarioDTO comentario)
     {
         Connection conn = ConexionDB.getInstance().getConnection();

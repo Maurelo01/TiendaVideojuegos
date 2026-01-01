@@ -80,4 +80,21 @@ public class ComentariosResource
             return Response.status(Response.Status.BAD_REQUEST).entity(new RespuestaError(e.getMessage())).build();
         }
     }
+    
+    @PUT
+    @Path("{id}/moderacion") // api/comentarios/{id}/moderacion?idUsuario=1&ocultar=true
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response moderarComentario(@PathParam("id") int idComentario, @QueryParam("idUsuario") int idUsuario, @QueryParam("ocultar") boolean ocultar) 
+    {
+        try 
+        {
+            service.cambiarEstadoOculto(idComentario, idUsuario, ocultar);
+            String estado = ocultar ? "ocultado" : "visible";
+            return Response.ok(new RespuestaExito("Comentario ahora está " + estado + ".")).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.FORBIDDEN).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
 }
