@@ -1,6 +1,7 @@
 package com.mycompany.tiendavideojuegos.models;
 
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
+import com.mycompany.tiendavideojuegos.DTO.ResultadoBusquedaDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
@@ -386,5 +387,36 @@ public class UsuarioEmpresa
             System.err.println("Error verificando estado empresa: " + e.getMessage());
         }
         return false;
+    }
+    
+    public List<ResultadoBusquedaDTO> buscarEmpresasPorNombre(String query)
+    {
+        List<ResultadoBusquedaDTO> resultados = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT id_empresa, nombre_empresa, imagen_banner FROM Empresa WHERE nombre_empresa LIKE ? AND estado = 'ACTIVO' LIMIT 5"))
+        {
+            ps.setString(1, "%" + query + "%");
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while (rs.next())
+                {
+                    ResultadoBusquedaDTO dto = new ResultadoBusquedaDTO();
+                    dto.setId(rs.getInt("id_empresa"));
+                    dto.setNombre(rs.getString("nombre_empresa"));
+                    dto.setTipo("EMPRESA");
+                    byte[] imgBytes = rs.getBytes("imagen_banner");
+                    if (imgBytes != null && imgBytes.length > 0)
+                    {
+                        dto.setImagen(Base64.getEncoder().encodeToString(imgBytes));
+                    }
+                    resultados.add(dto);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return resultados;
     }
 }

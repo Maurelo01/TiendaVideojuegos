@@ -18,6 +18,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -281,6 +282,55 @@ public class UsuariosResource
         catch (Exception e)
         {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
+    
+    @GET
+    @Path("{idUsuario}/vista-publica") // api/usuarios/{id}/vista-publica
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verPerfilPublico(@PathParam("idUsuario") int idBuscado, @QueryParam("solicitante") int idSolicitante) 
+    {
+        try 
+        {
+            UsuarioComunGamerDTO perfil = service.obtenerPerfilPublico(idBuscado, idSolicitante);
+            return Response.ok(perfil).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(Response.Status.NOT_FOUND).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
+
+    @PUT
+    @Path("{idUsuario}/privacidad") // api/usuarios/{id}/privacidad
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response cambiarPrivacidad(@PathParam("idUsuario") int idUsuario, UsuarioComunGamerDTO dto)
+    {
+        try 
+        {
+            boolean exito = service.cambiarPrivacidad(idUsuario, dto.isPerfilPublico());
+            if (exito) return Response.ok(new RespuestaExito("Privacidad actualizada.")).build();
+            return Response.serverError().build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.status(400).entity(new RespuestaError(e.getMessage())).build();
+        }
+    }
+    
+    @GET 
+    @Path("buscar") // api/usuarios/buscar
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response buscarUsuarios(@QueryParam("q") String query) 
+    {
+        try 
+        {
+            return Response.ok(service.buscarGeneral(query)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
         }
     }
 }

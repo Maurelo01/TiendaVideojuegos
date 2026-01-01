@@ -2,6 +2,7 @@ package com.mycompany.tiendavideojuegos.services;
 
 import com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO;
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
+import com.mycompany.tiendavideojuegos.DTO.ResultadoBusquedaDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioEmpresaDTO;
@@ -11,6 +12,7 @@ import com.mycompany.tiendavideojuegos.models.UsuarioEmpresa;
 import java.util.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -273,5 +275,66 @@ public class UsuariosService
     {
         if (idGamer <= 0 || idJuego <= 0) throw new Exception("Ids inválidos");
         return gamerModel.desinstalarJuegoEnBiblioteca(idGamer, idJuego);
+    }
+    
+    public UsuarioComunGamerDTO obtenerPerfilPublico(int idUsuarioBuscado, int idUsuarioSolicitante) throws Exception
+    {
+        UsuarioComunGamerDTO usuario = gamerModel.obtenerPorId(idUsuarioBuscado);
+        if (usuario == null)
+        {
+            throw new Exception("Usuario no encontrado.");
+        }
+        boolean esElMismoUsuario = (idUsuarioBuscado == idUsuarioSolicitante);
+        if (!esElMismoUsuario)
+        {
+            usuario.setContraseña(null);
+            usuario.setSaldoCartera(0);
+        }
+        if (!usuario.isPerfilPublico() && !esElMismoUsuario)
+        {
+            usuario.setCorreo("Privado");
+            usuario.setTelefono("Privado");
+            usuario.setBiblioteca(new ArrayList<>());
+        }
+        else
+        {
+            List<BibliotecaDTO> biblioteca = gamerModel.obtenerBiblioteca(idUsuarioBuscado);
+            usuario.setBiblioteca(biblioteca);
+        }
+
+        return usuario;
+    }
+    
+    public boolean cambiarPrivacidad(int idUsuario, boolean esPublico) throws Exception
+    {
+        if (idUsuario <= 0) throw new Exception("Id de usuario inválido.");
+        return gamerModel.actualizarPrivacidad(idUsuario, esPublico);
+    }
+    
+    public List<UsuarioComunGamerDTO> buscarGamers(String query) throws Exception
+    {
+        if (query == null || query.trim().isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return gamerModel.buscarPorNickname(query.trim());
+    }
+    
+    public List<ResultadoBusquedaDTO> buscarGeneral(String query) throws Exception
+    {
+        List<ResultadoBusquedaDTO> resultados = new ArrayList<>();
+        if (query == null || query.trim().isEmpty())
+        {
+            return resultados;
+        }
+        String texto = query.trim();
+        List<UsuarioComunGamerDTO> gamers = gamerModel.buscarPorNickname(texto);
+        for (UsuarioComunGamerDTO g : gamers)
+        {
+            resultados.add(new ResultadoBusquedaDTO(g.getIdUsuario(), g.getNickname(), g.getAvatar(), "GAMER"));
+        }
+        List<ResultadoBusquedaDTO> empresas = empresaModel.buscarEmpresasPorNombre(texto);
+        resultados.addAll(empresas);
+        return resultados;
     }
 }

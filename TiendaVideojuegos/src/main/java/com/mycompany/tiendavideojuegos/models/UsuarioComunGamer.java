@@ -78,7 +78,7 @@ public class UsuarioComunGamer
     {
         UsuarioComunGamerDTO gamer = null;
         Connection conn = ConexionDB.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT u.id_usuario, u.correo, u.rol, u.fecha_registro, g.nickname, g.fecha_nacimiento, g.telefono, g.pais, g.saldo_cartera, g.avatar FROM Usuario u " + 
+        try (PreparedStatement ps = conn.prepareStatement("SELECT u.id_usuario, u.correo, u.rol, u.fecha_registro, g.nickname, g.fecha_nacimiento, g.telefono, g.pais, g.saldo_cartera, g.avatar, g.perfil_publico FROM Usuario u " + 
                 "JOIN Usuario_Comun_Gamer g ON u.id_usuario = g.id_usuario WHERE u.id_usuario = ?")) 
         {
             ps.setInt(1, idUsuario);
@@ -96,6 +96,7 @@ public class UsuarioComunGamer
                     gamer.setTelefono(rs.getString("telefono"));
                     gamer.setPais(rs.getString("pais"));
                     gamer.setSaldoCartera(rs.getFloat("saldo_cartera"));
+                    gamer.setPerfilPublico(rs.getBoolean("perfil_publico"));
                     byte[] imgBytes = rs.getBytes("avatar");
                     if (imgBytes != null && imgBytes.length > 0) 
                     {
@@ -296,5 +297,46 @@ public class UsuarioComunGamer
             e.printStackTrace();
             return false;
         }
+    }
+    
+    public boolean actualizarPrivacidad(int idUsuario, boolean esPublico) throws Exception
+    {
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE Usuario_Comun_Gamer SET perfil_publico = ? WHERE id_usuario = ?"))
+        {
+            ps.setBoolean(1, esPublico);
+            ps.setInt(2, idUsuario);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
+    public List<UsuarioComunGamerDTO> buscarPorNickname(String textoBusqueda) 
+    {
+        List<UsuarioComunGamerDTO> resultados = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        try (PreparedStatement ps = conn.prepareStatement("SELECT id_usuario, nickname, avatar FROM Usuario_Comun_Gamer WHERE nickname LIKE ? AND perfil_publico = TRUE LIMIT 10")) 
+        {
+            ps.setString(1, "%" + textoBusqueda + "%");
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    UsuarioComunGamerDTO usuario = new UsuarioComunGamerDTO();
+                    usuario.setIdUsuario(rs.getInt("id_usuario"));
+                    usuario.setNickname(rs.getString("nickname"));
+                    byte[] imgBytes = rs.getBytes("avatar");
+                    if (imgBytes != null && imgBytes.length > 0)
+                    {
+                        usuario.setAvatar(Base64.getEncoder().encodeToString(imgBytes));
+                    }
+                    resultados.add(usuario);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+        return resultados;
     }
 }
