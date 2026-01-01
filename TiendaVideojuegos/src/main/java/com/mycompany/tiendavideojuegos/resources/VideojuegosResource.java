@@ -219,4 +219,19 @@ public class VideojuegosResource
             return Response.status(Response.Status.NOT_FOUND).entity(new RespuestaError(e.getMessage())).build();
         }
     }
+    
+    @GET
+    @Path("categorias") // api/videojuegos/categorias
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response obtenerCategorias()
+    {
+        try 
+        {
+            return Response.ok(service.obtenerCategorias()).build(); 
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
 }

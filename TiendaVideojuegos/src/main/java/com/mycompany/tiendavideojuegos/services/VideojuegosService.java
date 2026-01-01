@@ -1,5 +1,6 @@
 package com.mycompany.tiendavideojuegos.services;
 
+import com.mycompany.tiendavideojuegos.DTO.CategoriaDTO;
 import com.mycompany.tiendavideojuegos.DTO.MultimediaDTO;
 import com.mycompany.tiendavideojuegos.DTO.VideojuegosDTO;
 import com.mycompany.tiendavideojuegos.models.Videojuegos;
@@ -153,5 +154,10 @@ public class VideojuegosService
         VideojuegosDTO juego = modelo.obtenerPorId(id);
         if (juego == null) throw new Exception("Juego no encontrado");
         return juego;
+    }
+    
+    public List<CategoriaDTO> obtenerCategorias() throws Exception
+    {
+        return modelo.obtenerTodasLasCategorias(); 
     }
 }
