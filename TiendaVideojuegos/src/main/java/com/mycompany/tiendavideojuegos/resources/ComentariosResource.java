@@ -97,4 +97,19 @@ public class ComentariosResource
             return Response.status(Response.Status.FORBIDDEN).entity(new RespuestaError(e.getMessage())).build();
         }
     }
+    
+    @GET
+    @Path("reporte/feedback/{idEmpresa}") // api/comentarios/reporte/feedback/{id}
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reporteFeedback(@PathParam("idEmpresa") int idEmpresa) 
+    {
+        try 
+        {
+            return Response.ok(service.generarReporteFeedback(idEmpresa)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
 }
