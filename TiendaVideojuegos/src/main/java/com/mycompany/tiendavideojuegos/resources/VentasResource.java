@@ -166,4 +166,34 @@ public class VentasResource
             return Response.serverError().entity("Error generando PDF: " + e.getMessage()).build();
         }
     }
+    
+    @GET
+    @Path("reporte/ranking-compradores") // api/ventas/reporte/ranking-compradores
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRankingCompradores() 
+    {
+        try 
+        {
+            return Response.ok(service.obtenerRankingCompradores()).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
+
+    @GET
+    @Path("reporte/ranking-reviewers") // api/ventas/reporte/ranking-reviewers
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRankingReviewers() 
+    {
+        try 
+        {
+            return Response.ok(service.obtenerRankingReviewers()).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
 }

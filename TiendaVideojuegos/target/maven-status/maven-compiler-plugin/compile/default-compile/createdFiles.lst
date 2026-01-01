@@ -39,6 +39,7 @@ com/mycompany/tiendavideojuegos/DTO/ReporteVentasEmpresaDTO.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioEmpresaDTO.class
 com/mycompany/tiendavideojuegos/models/Categoria.class
 com/mycompany/tiendavideojuegos/models/Banner.class
+com/mycompany/tiendavideojuegos/DTO/ReporteRankingDTO.class
 com/mycompany/tiendavideojuegos/models/Comentario.class
 com/mycompany/tiendavideojuegos/DTO/RespuestaRecarga.class
 com/mycompany/tiendavideojuegos/models/Configuracion.class
