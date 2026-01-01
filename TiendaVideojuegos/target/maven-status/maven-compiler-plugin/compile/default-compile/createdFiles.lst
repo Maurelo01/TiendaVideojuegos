@@ -52,4 +52,5 @@ com/mycompany/tiendavideojuegos/DTO/SolicitudLogin.class
 com/mycompany/tiendavideojuegos/services/PrestamosService.class
 com/mycompany/tiendavideojuegos/services/VentasService.class
 com/mycompany/tiendavideojuegos/resources/PrestamosResource.class
+com/mycompany/tiendavideojuegos/DTO/ResultadoBusquedaDTO.class
 com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.class
