@@ -1,3 +1,4 @@
+com/mycompany/tiendavideojuegos/DTO/ComparativaCalificacionDTO.class
 com/mycompany/tiendavideojuegos/services/AdminService.class
 com/mycompany/tiendavideojuegos/resources/GruposResource.class
 com/mycompany/tiendavideojuegos/models/GrupoFamiliar.class
@@ -36,6 +37,7 @@ com/mycompany/tiendavideojuegos/DTO/SolicitudSaldo.class
 com/mycompany/tiendavideojuegos/resources/VentasResource.class
 com/mycompany/tiendavideojuegos/services/GruposService.class
 com/mycompany/tiendavideojuegos/resources/ComentariosResource.class
+com/mycompany/tiendavideojuegos/DTO/AnalisisCategoriaDTO.class
 com/mycompany/tiendavideojuegos/DTO/ReporteVentasEmpresaDTO.class
 com/mycompany/tiendavideojuegos/DTO/ReporteFeedbackDTO.class
 com/mycompany/tiendavideojuegos/DTO/UsuarioEmpresaDTO.class
@@ -55,6 +57,7 @@ com/mycompany/tiendavideojuegos/services/ComentariosService.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudLogin.class
 com/mycompany/tiendavideojuegos/services/PrestamosService.class
 com/mycompany/tiendavideojuegos/services/VentasService.class
+com/mycompany/tiendavideojuegos/DTO/ReporteAnalisisDTO.class
 com/mycompany/tiendavideojuegos/resources/PrestamosResource.class
 com/mycompany/tiendavideojuegos/DTO/ResultadoBusquedaDTO.class
 com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.class
