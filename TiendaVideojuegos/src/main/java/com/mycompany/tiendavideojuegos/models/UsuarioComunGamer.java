@@ -1,6 +1,8 @@
 package com.mycompany.tiendavideojuegos.models;
 
+import com.mycompany.tiendavideojuegos.DTO.AnalisisCategoriaDTO;
 import com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO;
+import com.mycompany.tiendavideojuegos.DTO.ComparativaCalificacionDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
 import java.sql.Connection;
@@ -338,5 +340,70 @@ public class UsuarioComunGamer
             e.printStackTrace();
         }
         return resultados;
+    }
+    
+    public List<AnalisisCategoriaDTO> obtenerCategoriasFavoritas(int idGamer)
+    {
+        List<AnalisisCategoriaDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String catFavSql = "SELECT c.nombre_categoria, COUNT(jc.id_juego) as total " +
+                    "FROM Biblioteca_Personal bp " +
+                    "JOIN Juego_Categoria jc ON bp.id_juego = jc.id_juego " +
+                    "JOIN Categoria c ON jc.id_categoria = c.id_categoria " +
+                    "WHERE bp.id_gamer = ? " +
+                    "GROUP BY c.id_categoria, c.nombre_categoria " +
+                    "ORDER BY total DESC " +
+                    "LIMIT 5";
+        try (PreparedStatement ps = conn.prepareStatement(catFavSql))
+        {
+            ps.setInt(1, idGamer);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    lista.add(new AnalisisCategoriaDTO(rs.getString("nombre_categoria"), rs.getInt("total")));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+    
+    public List<ComparativaCalificacionDTO> obtenerComparativa(int idGamer)
+    {
+        List<ComparativaCalificacionDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        String comparativaSql = "SELECT v.titulo, " +
+                    "c_propio.calificacion as mi_nota, " +
+                    "(SELECT AVG(c_all.calificacion) " +
+                    "FROM Comentario c_all WHERE c_all.id_juego = v.id_juego AND c_all.id_comentario_principal IS NULL) as promedio_global " +
+                    "FROM Comentario c_propio " +
+                    "JOIN Videojuego v ON c_propio.id_juego = v.id_juego " +
+                    "WHERE c_propio.id_gamer = ? " +
+                    "AND c_propio.id_comentario_principal IS NULL"; 
+
+        try (PreparedStatement ps = conn.prepareStatement(comparativaSql))
+        {
+            ps.setInt(1, idGamer);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    ComparativaCalificacionDTO dto = new ComparativaCalificacionDTO();
+                    dto.setTituloJuego(rs.getString("titulo"));
+                    dto.setMiCalificacion(rs.getInt("mi_nota"));
+                    dto.setPromedioComunidad(rs.getFloat("promedio_global"));
+                    lista.add(dto);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return lista;
     }
 }

@@ -333,4 +333,19 @@ public class UsuariosResource
             return Response.serverError().build();
         }
     }
+    
+    @GET
+    @Path("gamer/{id}/analisis") // api/usuarios/gamer/{id}/analisis
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reporteAnalisisGamer(@PathParam("id") int idGamer) 
+    {
+        try 
+        {
+            return Response.ok(service.generarAnalisisGamer(idGamer)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
 }

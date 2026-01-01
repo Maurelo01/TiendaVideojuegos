@@ -2,6 +2,7 @@ package com.mycompany.tiendavideojuegos.services;
 
 import com.mycompany.tiendavideojuegos.DTO.BibliotecaDTO;
 import com.mycompany.tiendavideojuegos.DTO.EmpresaDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteAnalisisDTO;
 import com.mycompany.tiendavideojuegos.DTO.ResultadoBusquedaDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioComunGamerDTO;
 import com.mycompany.tiendavideojuegos.DTO.UsuarioDTO;
@@ -336,5 +337,14 @@ public class UsuariosService
         List<ResultadoBusquedaDTO> empresas = empresaModel.buscarEmpresasPorNombre(texto);
         resultados.addAll(empresas);
         return resultados;
+    }
+    
+    public ReporteAnalisisDTO generarAnalisisGamer(int idGamer) throws Exception
+    {
+        if (idGamer <= 0) throw new Exception("Id usuario inválido");
+        ReporteAnalisisDTO reporte = new ReporteAnalisisDTO();
+        reporte.setCategoriasFavoritas(gamerModel.obtenerCategoriasFavoritas(idGamer));
+        reporte.setComparativaCalificaciones(gamerModel.obtenerComparativa(idGamer));
+        return reporte;
     }
 }

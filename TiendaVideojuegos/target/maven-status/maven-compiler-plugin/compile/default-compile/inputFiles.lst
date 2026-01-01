@@ -1,5 +1,6 @@
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/services/ComentariosService.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/SolicitudCompra.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/ReporteAnalisisDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/SolicitudPrestamoDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/BannerDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/ReporteVentasEmpresaDTO.java
@@ -21,6 +22,7 @@
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/SolicitudRegistroEmpresa.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/UsuariosResource.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/ResultadoBusquedaDTO.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/AnalisisCategoriaDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/models/Banner.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/models/Categoria.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/SolicitudLogin.java
@@ -34,6 +36,7 @@
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/ReporteAdminDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/PrestamosResource.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/JakartaEE10Resource.java
+/home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/ComparativaCalificacionDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/services/ReportesService.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/DTO/UsuarioComunGamerDTO.java
 /home/mauricio/Escritorio/VAQUERAS/Proyecto/TiendaVideojuegos/src/main/java/com/mycompany/tiendavideojuegos/resources/ComentariosResource.java
