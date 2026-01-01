@@ -3,6 +3,7 @@ package com.mycompany.tiendavideojuegos.models;
 import com.mycompany.tiendavideojuegos.DTO.HistorialComprasDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteAdminDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteRankingDTO;
+import com.mycompany.tiendavideojuegos.DTO.ReporteTopJuegosDTO;
 import com.mycompany.tiendavideojuegos.DTO.ReporteVentasEmpresaDTO;
 import com.mycompany.tiendavideojuegos.DTO.SolicitudCompra;
 import com.mycompany.tiendavideojuegos.configuracion.ConexionDB;
@@ -21,7 +22,6 @@ public class Ventas
     public boolean procesarCompra(SolicitudCompra solicitud) throws Exception 
     {
         Connection conn = ConexionDB.getInstance().getConnection();
-        
         // Validar Juego
         float precioJuego = 0;
         String clasificacion = "";
@@ -30,16 +30,21 @@ public class Ventas
         try (PreparedStatement ps = conn.prepareStatement("SELECT v.precio, v.clasificacion_edad, v.estado, e.porcentaje_comision_especifica FROM Videojuego v JOIN Empresa e ON v.id_empresa = e.id_empresa WHERE v.id_juego = ?"))
         {
             ps.setInt(1, solicitud.getIdJuego());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    if (!"ACTIVO".equals(rs.getString("estado"))) {
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    if (!"ACTIVO".equals(rs.getString("estado")))
+                    {
                         throw new Exception("El juego no está disponible para la venta.");
                     }
                     precioJuego = rs.getFloat("precio");
                     clasificacion = rs.getString("clasificacion_edad");
                     float comEsp = rs.getFloat("porcentaje_comision_especifica");
                     if (!rs.wasNull()) comisionEmpresa = comEsp;
-                } else {
+                }
+                else
+                {
                     throw new Exception("El videojuego no existe.");
                 }
             }
@@ -169,7 +174,6 @@ public class Ventas
             System.err.println("Error: No se pudo eliminar la venta: " + e.getMessage());
         }
     }
-
 
     private float obtenerComisionGlobal(Connection conn) 
     {
@@ -366,6 +370,64 @@ public class Ventas
         catch (Exception e) 
         {
             System.err.println("Error obteniendo top reviewers: " + e.getMessage());
+        }
+        return lista;
+    }
+    
+    public List<ReporteTopJuegosDTO> obtenerTopJuegosBalance(Integer idCategoria, String clasificacionEdad) 
+    {
+        List<ReporteTopJuegosDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        StringBuilder topJuegoSql = new StringBuilder
+        (
+            "SELECT v.titulo, e.nombre_empresa, " +
+            "COUNT(DISTINCT t.id_venta) as total_ventas, " +
+            "COALESCE(AVG(c.calificacion), 0) as promedio_calificacion, " +
+            // Formula: (Ventas * 0.5) + (Promedio * 2)
+            "(COUNT(DISTINCT t.id_venta) * 0.5 + COALESCE(AVG(c.calificacion), 0) * 2) as puntaje_balance " +
+            "FROM Videojuego v " +
+            "JOIN Empresa e ON v.id_empresa = e.id_empresa " +
+            "LEFT JOIN Venta t ON v.id_juego = t.id_juego " +
+            "LEFT JOIN Comentario c ON v.id_juego = c.id_juego " +
+            "LEFT JOIN Juego_Categoria jc ON v.id_juego = jc.id_juego " +
+            "WHERE v.estado = 'ACTIVO' ");
+        if (idCategoria != null && idCategoria > 0)
+        {
+            topJuegoSql.append("AND jc.id_categoria = ? ");
+        }
+        if (clasificacionEdad != null && !clasificacionEdad.isEmpty()) 
+        {
+            topJuegoSql.append("AND v.clasificacion_edad = ? ");
+        }
+        topJuegoSql.append("GROUP BY v.id_juego, v.titulo, e.nombre_empresa ORDER BY puntaje_balance DESC LIMIT 20");
+        try (PreparedStatement ps = conn.prepareStatement(topJuegoSql.toString())) 
+        {
+            int indice = 1;
+            if (idCategoria != null && idCategoria > 0)
+            {
+                ps.setInt(indice++, idCategoria);
+            }
+            if (clasificacionEdad != null && !clasificacionEdad.isEmpty())
+            {
+                ps.setString(indice++, clasificacionEdad);
+            }
+            try (ResultSet rs = ps.executeQuery()) 
+            {
+                while (rs.next()) 
+                {
+                    ReporteTopJuegosDTO dto = new ReporteTopJuegosDTO();
+                    dto.setTitulo(rs.getString("titulo"));
+                    dto.setNombreEmpresa(rs.getString("nombre_empresa"));
+                    dto.setTotalVentas(rs.getInt("total_ventas"));
+                    dto.setPromedioCalificacion(rs.getFloat("promedio_calificacion"));
+                    dto.setPuntajeBalance(rs.getFloat("puntaje_balance"));
+                    lista.add(dto);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            System.err.println("Error en reporte Top Juegos: " + e.getMessage());
         }
         return lista;
     }

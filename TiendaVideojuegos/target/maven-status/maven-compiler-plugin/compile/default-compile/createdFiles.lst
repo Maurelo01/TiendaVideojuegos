@@ -45,6 +45,7 @@ com/mycompany/tiendavideojuegos/DTO/RespuestaRecarga.class
 com/mycompany/tiendavideojuegos/models/Configuracion.class
 com/mycompany/tiendavideojuegos/DTO/GrupoFamiliarDTO.class
 com/mycompany/tiendavideojuegos/DTO/ConfiguracionDTO.class
+com/mycompany/tiendavideojuegos/DTO/ReporteTopJuegosDTO.class
 com/mycompany/tiendavideojuegos/models/Prestamo.class
 com/mycompany/tiendavideojuegos/DTO/BannerDTO.class
 com/mycompany/tiendavideojuegos/resources/UsuariosResource.class

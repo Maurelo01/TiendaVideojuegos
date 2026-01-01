@@ -196,4 +196,19 @@ public class VentasResource
             return Response.serverError().build();
         }
     }
+    
+    @GET
+    @Path("reporte/top-juegos") // api/ventas/reporte/top-juegos?categoria=1&edad=T
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTopJuegos(@QueryParam("categoria") Integer idCategoria, @QueryParam("edad") String edad) 
+    {
+        try 
+        {
+            return Response.ok(service.obtenerTopJuegos(idCategoria, edad)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
 }
