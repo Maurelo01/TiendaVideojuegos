@@ -431,4 +431,47 @@ public class Ventas
         }
         return lista;
     }
+    
+    public List<ReporteVentasEmpresaDTO> obtenerTop5Ventas(int idEmpresa, String fechaInicio, String fechaFin)
+    {
+        List<ReporteVentasEmpresaDTO> lista = new ArrayList<>();
+        Connection conn = ConexionDB.getInstance().getConnection();
+        
+        if (fechaInicio == null || fechaInicio.isEmpty()) fechaInicio = "2020-01-01";
+        if (fechaFin == null || fechaFin.isEmpty()) fechaFin = "2030-12-31";
+
+        String top5Sql = "SELECT v.titulo, COUNT(t.id_venta) as cantidad, " +
+                     "SUM(t.ganancia_empresa) as neto " +
+                     "FROM Venta t " +
+                     "JOIN Videojuego v ON t.id_juego = v.id_juego " +
+                     "WHERE v.id_empresa = ? " +
+                     "AND t.fecha_compra BETWEEN ? AND ? " +
+                     "GROUP BY v.id_juego, v.titulo " +
+                     "ORDER BY cantidad DESC " +
+                     "LIMIT 5";
+
+        try (PreparedStatement ps = conn.prepareStatement(top5Sql))
+        {
+            ps.setInt(1, idEmpresa);
+            ps.setString(2, fechaInicio + " 00:00:00");
+            ps.setString(3, fechaFin + " 23:59:59");
+            
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    ReporteVentasEmpresaDTO item = new ReporteVentasEmpresaDTO();
+                    item.setTituloJuego(rs.getString("titulo"));
+                    item.setCopiasVendidas(rs.getInt("cantidad"));
+                    item.setGananciaNeta(rs.getFloat("neto"));
+                    lista.add(item);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println("Error obteniendo Top 5: " + e.getMessage());
+        }
+        return lista;
+    }
 }
