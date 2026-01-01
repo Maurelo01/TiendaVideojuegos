@@ -35,6 +35,7 @@ com/mycompany/tiendavideojuegos/DTO/BibliotecaDTO.class
 com/mycompany/tiendavideojuegos/DTO/RespuestaExito.class
 com/mycompany/tiendavideojuegos/DTO/SolicitudSaldo.class
 com/mycompany/tiendavideojuegos/resources/VentasResource.class
+com/mycompany/tiendavideojuegos/DTO/ReporteUsoFamiliarDTO.class
 com/mycompany/tiendavideojuegos/services/GruposService.class
 com/mycompany/tiendavideojuegos/resources/ComentariosResource.class
 com/mycompany/tiendavideojuegos/DTO/AnalisisCategoriaDTO.class
