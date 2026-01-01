@@ -75,4 +75,10 @@ public class VentasService
     {
         return modelo.obtenerTopJuegosBalance(idCategoria, clasificacion);
     }
+    
+    public List<ReporteVentasEmpresaDTO> obtenerTop5Empresa(int idEmpresa, String inicio, String fin) throws Exception
+    {
+        if (idEmpresa <= 0) throw new Exception("Id empresa inválido");
+        return modelo.obtenerTop5Ventas(idEmpresa, inicio, fin);
+    }
 }

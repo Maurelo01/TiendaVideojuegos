@@ -181,7 +181,7 @@ public class VentasResource
             return Response.serverError().build();
         }
     }
-
+    
     @GET
     @Path("reporte/ranking-reviewers") // api/ventas/reporte/ranking-reviewers
     @Produces(MediaType.APPLICATION_JSON)
@@ -205,6 +205,21 @@ public class VentasResource
         try 
         {
             return Response.ok(service.obtenerTopJuegos(idCategoria, edad)).build();
+        } 
+        catch (Exception e) 
+        {
+            return Response.serverError().build();
+        }
+    }
+    
+    @GET
+    @Path("reporte/empresa/{id}/top5") // api/ventas/reporte/empresa/{id}/top5?inicio=...&fin=...
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTop5Empresa(@PathParam("id") int idEmpresa, @QueryParam("inicio") String inicio, @QueryParam("fin") String fin) 
+    {
+        try 
+        {
+            return Response.ok(service.obtenerTop5Empresa(idEmpresa, inicio, fin)).build();
         } 
         catch (Exception e) 
         {
